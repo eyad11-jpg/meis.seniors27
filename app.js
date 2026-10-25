@@ -408,11 +408,22 @@ function initTrips() {
   const box = $('#tripl'), trips = S.trips || [];
   if (!trips.length) { box.append(el('p', { class: 'hand', text: 'No trips yet. We were busy being legends at home.' })); return; }
   trips.forEach((t, i) => {
-    const strip = el('div', { class: 'strip' });
+    const strip = el('div', { class: 'strip', style: 'display: flex; flex-wrap: wrap; gap: 12px; width: 100%; height: auto;' });
     [0, 1].forEach(k => strip.append(polaroid(null, '', i * 2 + k)));
-    const stop = el('div', { class: 'stop' },
+    
+    // Updated card styles so height and width expand to fit photo dimensions
+    const ticket = el('div', { class: 'ticket', style: 'height: auto; min-height: fit-content; max-width: 100%; display: inline-block;' },
+      el('h3', { text: t.name }),
+      t.date ? el('span', { class: 'stamp', text: t.date }) : null,
+      t.note ? el('p', { text: t.note }) : null,
+      strip
+    );
+
+    const stop = el('div', { class: 'stop', style: 'height: auto; align-items: flex-start;' },
       el('span', { class: 'pinm', 'aria-hidden': 'true', text: i === 0 ? '✈️' : '📍' }),
-      el('div', { class: 'ticket' }, el('h3', { text: t.name }), t.date ? el('span', { class: 'stamp', text: t.date }) : null, t.note ? el('p', { text: t.note }) : null, strip));
+      ticket
+    );
+
     box.append(stop);
     const base = t.folder ? 'trips/' + t.folder : null;
     const explicit = (t.photos || []).map(f => path(f, base || 'trips'));
@@ -420,11 +431,22 @@ function initTrips() {
       const srcs = [...new Set([...explicit, ...found])];
       if (!srcs.length) return;
       const items = srcs.map((src, k) => ({ src, cap: t.name }));
-      strip.replaceChildren(...items.map((it, k) => { const b = el('button', { type: 'button', 'aria-label': 'Open photo from ' + t.name }, polaroid(it.src, '', k)); b.onclick = () => { pop(); openLB(items, k); }; return b; }));
+      strip.replaceChildren(...items.map((it, k) => {
+        const pol = polaroid(it.src, '', k);
+        // Ensure photo maintains auto height and scaled width inside button wrapper
+        const img = pol.querySelector('img');
+        if (img) {
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.objectFit = 'contain';
+        }
+        const b = el('button', { type: 'button', style: 'height: auto; width: fit-content; border: none; background: none; padding: 0;', 'aria-label': 'Open photo from ' + t.name }, pol);
+        b.onclick = () => { pop(); openLB(items, k); };
+        return b;
+      }));
     });
   });
 }
-
 /* ============ SECRET MAIL ============ */
 const api = () => (S.mailApi || '').trim();
 let names = null;
