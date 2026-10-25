@@ -140,55 +140,36 @@ let current = 'splash', busy = false, pending = null, depth = 0;
 let tap = { x: innerWidth / 2, y: innerHeight / 2 };
 const hashId = () => { const h = location.hash.slice(1); return screens.includes(h) ? h : null; };
 
-/* "Tide Curtain": three sticker-bright sheets with wavy edges rise over the screen, the page name pops up,
-   then the sheets carry on upward while the new screen builds in piece by piece. */
-const TITLES = { splash: "MEIS'27", countdown: 'Tick. Tock.', home: 'Our home', photos: 'The Photo Spin', people: "Who's Who", trips: 'Trips', mail: 'Secret Mail' };
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const settled = a => a.finished.catch(() => {});
-async function portal(cur, nxt) {
-  const fx = $('#fx'), H = innerHeight, Wv = Math.round(H * .14), dist = H + Wv + 6;
-  const EI = 'cubic-bezier(.65,0,.3,1)', EO = 'cubic-bezier(.7,0,.25,1)';
-  const CREST = 'M0 64C100 14 200 14 300 64S500 114 600 64S800 14 900 64S1100 114 1200 64';
-  const hide = nxt.animate([{ opacity: 0 }, { opacity: 0 }], { duration: 60000, fill: 'both' });
-  const sheets = ['--pink', '--yellow', '--blue'].map((c, i) => {
-    const s = el('div', { class: 'tsheet', style: `color:var(${c});transform:translateY(${dist}px)` });
-    s.innerHTML = `<svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="none" style="height:${Wv}px" aria-hidden="true"><path d="${CREST}V120H0Z" fill="currentColor"/><path d="${CREST}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
-    s.firstElementChild.animate([{ transform: 'translateX(-3%)' }, { transform: 'translateX(3%)' }],
-      { duration: 1500 + i * 250, direction: i % 2 ? 'alternate-reverse' : 'alternate', iterations: Infinity, easing: 'ease-in-out' });
-    fx.append(s);
-    return s;
-  });
-  let lab = null;
-  try {
-    const enter = Promise.all(sheets.map((s, i) => settled(s.animate(
-      [{ transform: `translateY(${dist}px)` }, { transform: 'translateY(0px)' }],
-      { duration: 560, delay: i * 80, easing: EI, fill: 'both' }))));
-    await sleep(430);
-    lab = el('div', { class: 'tlabel' },
-      el('div', { class: 'mask' }, el('b', { text: TITLES[nxt.id] || '' })),
-      el('div', { class: 'cap', 'aria-hidden': 'true', text: '🎓' }));
-    fx.append(lab);
-    const word = lab.querySelector('b'), capEl = lab.querySelector('.cap');
-    const wordIn = settled(word.animate([{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }],
-      { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }));
-    capEl.animate([{ transform: 'scale(0) rotate(-40deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(8deg)', opacity: 1, offset: .65 }, { transform: 'scale(1) rotate(0)', opacity: 1 }],
-      { duration: 520, delay: 160, easing: 'ease-out', fill: 'both' });
-    await Promise.all([enter, wordIn]);
-    hide.cancel();
-    await sleep(200);
-    word.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-110%)' }], { duration: 360, easing: EI, fill: 'both' });
-    capEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, fill: 'both' });
-    [...nxt.querySelectorAll(':scope > .page > *, :scope > .splash > *')].forEach((k, i) => k.animate(
-      [{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }],
-      { duration: 620, delay: 300 + i * 70, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
-    await Promise.all(sheets.map((s, i) => settled(s.animate(
-      [{ transform: 'translateY(0px)' }, { transform: `translateY(${-dist}px)` }],
-      { duration: 640, delay: (2 - i) * 80, easing: EO, fill: 'both' }))));
-  } finally {
-    hide.cancel();
-    sheets.forEach(s => s.remove());
-    if (lab) lab.remove();
-  }
+/* "Split Doors": a glowing seam cuts the old page in two, the halves slide apart,
+   and the new page rushes in from behind with its pieces building in one by one. */
+function portal(cur, nxt) {
+  const fx = $('#fx'), D = 900, E = 'cubic-bezier(.7,0,.2,1)';
+  const half = side => {
+    const c = cur.cloneNode(true);
+    c.removeAttribute('id');
+    c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    c.setAttribute('aria-hidden', 'true');
+    c.inert = true;
+    c.style.clipPath = side === 'l' ? 'inset(0 50% 0 0)' : 'inset(0 0 0 50%)';
+    return c;
+  };
+  const slit = el('div', { class: 'cutslit' }), seam = el('div', { class: 'cutseam' });
+  const L = half('l'), R = half('r');
+  fx.append(slit, L, R, seam);
+  L.scrollTop = R.scrollTop = cur.scrollTop;
+  seam.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 260, easing: 'cubic-bezier(.3,.7,.2,1)', fill: 'both' });
+  seam.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: 260, fill: 'both' });
+  const o = { duration: D, delay: 240, easing: E, fill: 'both' };
+  const a1 = L.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], o);
+  const a2 = R.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(50%)' }], o);
+  slit.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], o);
+  slit.animate([{ opacity: 1 }, { opacity: 1, offset: .55 }, { opacity: 0 }], o);
+  nxt.animate([{ transform: 'scale(1.12)' }, { transform: 'none' }],
+    { duration: D + 200, delay: 240, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+  [...nxt.querySelectorAll(':scope > .page > *, :scope > .splash > *')].forEach((k, i) => k.animate(
+    [{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }],
+    { duration: 620, delay: 420 + i * 70, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
+  return Promise.all([a1.finished, a2.finished]).catch(() => {}).then(() => [slit, L, R, seam].forEach(n => n.remove()));
 }
 function show(id) {
   if (id === current) return;
