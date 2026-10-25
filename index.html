@@ -243,5 +243,68 @@
 
 <script src="content.js"></script>
 <script src="app.js"></script>
+
+<!-- كود عرض السينيورز والبحث -->
+<script>
+function convertDriveLink(url) {
+    if (!url) return '';
+    let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+        return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    return url;
+}
+
+let allSeniors = [];
+
+fetch('data.json')
+  .then(response => response.json())
+  .then(seniors => {
+    allSeniors = seniors;
+    renderSeniors(allSeniors);
+  })
+  .catch(error => console.error('Error loading senior data:', error));
+
+function renderSeniors(seniorsList) {
+    const grid = document.getElementById('pgrid');
+    const noneMsg = document.getElementById('pnone');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    if (seniorsList.length === 0) {
+        if (noneMsg) noneMsg.hidden = false;
+        return;
+    } else {
+        if (noneMsg) noneMsg.hidden = true;
+    }
+    
+    seniorsList.forEach(senior => {
+        const card = document.createElement('div');
+        card.className = 'senior-card';
+        
+        card.innerHTML = `
+          <div class="senior-images">
+            <img src="${convertDriveLink(senior['Old or current you'])}" alt="${senior['Name']}" class="current-photo" loading="lazy">
+            <img src="${convertDriveLink(senior['Baby you'])}" alt="${senior['Name']} baby" class="baby-photo" loading="lazy">
+          </div>
+          <h3 class="senior-name">${senior['Name']}</h3>
+        `;
+        
+        grid.appendChild(card);
+    });
+}
+
+const searchInput = document.getElementById('psearch');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        const filtered = allSeniors.filter(senior => 
+            senior['Name'] && senior['Name'].toLowerCase().includes(term)
+        );
+        renderSeniors(filtered);
+    });
+}
+</script>
 </body>
 </html>
