@@ -13,18 +13,10 @@ window.SITE = {
     {
       id: "exam",
       label: "Final Exam",
-      date: "2027-05-24T09:00:00",           // <<< CHANGE ME: your real final exam date
+      date: "2027-07-21T09:00:00",           // <<< CHANGE ME: your real final exam date
       sub: "until the final exam (we believe in you. a little.)",
       joke: "Every second brings us closer. Also closer to exams. Sorry.",
       done: "The exams are over. Breathe. Hydrate. Never speak of it."
-    },
-    {
-      id: "grad",
-      label: "Graduation Day",
-      date: "2027-07-21T18:00:00",           // graduation day: 21 July 2027
-      sub: "until we walk across that stage",
-      joke: "Every second brings us closer to the stage. Hydrate. Cry later.",
-      done: "WE DID IT. Go hug somebody."
     }
   ],
 
