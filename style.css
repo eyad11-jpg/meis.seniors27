@@ -343,3 +343,6 @@ box-shadow:0 1px 0 var(--edge),0 2px 0 var(--edge),0 3px 0 var(--edge),0 4px 0 v
 @keyframes titlewob{0%,100%{transform:perspective(600px) rotateY(-6deg) rotateX(2deg)}50%{transform:perspective(600px) rotateY(6deg) rotateX(-2deg)}}
 .lite .rg,.lite .cube,.lite .slab,.lite .cdc,.lite .stop,.lite .bigbtn,.lite .title,.lite .fl i{animation:none}
 .lite .tilt{transform:none}
+/* ---------- Split Doors page transition ---------- */
+.cutslit{position:absolute;inset:0;background:var(--yellow);will-change:transform,opacity}
+.cutseam{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:#fff;box-shadow:0 0 0 3px var(--yellow),0 0 28px 6px rgba(255,200,61,.85);transform-origin:50% 0;will-change:transform}
