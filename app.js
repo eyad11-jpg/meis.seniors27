@@ -140,39 +140,56 @@ let current = 'splash', busy = false, pending = null, depth = 0;
 let tap = { x: innerWidth / 2, y: innerHeight / 2 };
 const hashId = () => { const h = location.hash.slice(1); return screens.includes(h) ? h : null; };
 
-/* "Polaroid Flash": camera flash at the tap, the old screen becomes a polaroid and drops away,
-   the new screen "develops" (blurry, sepia, bright -> sharp, full color) with a confetti pop. */
-function portal(cur, nxt) {
-  const W = innerWidth, H = innerHeight, { x, y } = tap, fx = $('#fx');
-  const r = Math.ceil(Math.hypot(Math.max(x, W - x), Math.max(y, H - y))) + 40;
-  cur.style.transformOrigin = '50% 50%';
-  cur.style.outline = '0 solid #fff';
-  cur.animate([
-    { transform: 'perspective(900px) rotateX(0deg) rotate(0deg) translateY(0px) scale(1)', outlineWidth: '0px', boxShadow: '0 0 0 rgba(0,0,0,0)', offset: 0 },
-    { transform: 'perspective(900px) rotateX(8deg) rotate(2deg) translateY(0px) scale(.8)', outlineWidth: '22px', boxShadow: '12px 18px 0 rgba(0,0,0,.4)', offset: .35 },
-    { transform: 'perspective(900px) rotateX(40deg) rotate(14deg) translateY(95vh) scale(.7)', outlineWidth: '22px', boxShadow: '12px 18px 0 rgba(0,0,0,.4)', offset: 1 }],
-    { duration: 950, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' });
-  const fl = el('div', { class: 'flash', style: `left:${x - r}px;top:${y - r}px;width:${2 * r}px;height:${2 * r}px` });
-  fx.append(fl);
-  fl.animate([{ transform: 'scale(0)', opacity: 1 }, { transform: 'scale(.55)', opacity: 1, offset: .35 }, { transform: 'scale(1)', opacity: 0 }],
-    { duration: 520, easing: 'ease-out', fill: 'forwards' }).onfinish = () => fl.remove();
-  ['🎓', '✨', '💛', '🎉', '💙', '✨', '📸'].forEach((ch, i) => {
-    const b = el('span', { class: 'burst', text: ch, style: `left:${x - 13}px;top:${y - 13}px` });
-    fx.append(b);
-    const a = (i / 7) * Math.PI * 2 + Math.random() * .6, d = 70 + Math.random() * 90;
-    b.animate([{ transform: 'translate(0,0) scale(.3) rotate(0)', opacity: 1 },
-      { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 30}px) scale(1.2) rotate(${(Math.random() - .5) * 200}deg)`, opacity: 1, offset: .55 },
-      { transform: `translate(${Math.cos(a) * d * 1.2}px,${Math.sin(a) * d + 60}px) scale(.8)`, opacity: 0 }],
-      { duration: 900, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b.remove();
+/* "Tide Curtain": three sticker-bright sheets with wavy edges rise over the screen, the page name pops up,
+   then the sheets carry on upward while the new screen builds in piece by piece. */
+const TITLES = { splash: "MEIS'27", countdown: 'Tick. Tock.', home: 'Our home', photos: 'The Photo Spin', people: "Who's Who", trips: 'Trips', mail: 'Secret Mail' };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const settled = a => a.finished.catch(() => {});
+async function portal(cur, nxt) {
+  const fx = $('#fx'), H = innerHeight, Wv = Math.round(H * .14), dist = H + Wv + 6;
+  const EI = 'cubic-bezier(.65,0,.3,1)', EO = 'cubic-bezier(.7,0,.25,1)';
+  const CREST = 'M0 64C100 14 200 14 300 64S500 114 600 64S800 14 900 64S1100 114 1200 64';
+  const hide = nxt.animate([{ opacity: 0 }, { opacity: 0 }], { duration: 60000, fill: 'both' });
+  const sheets = ['--pink', '--yellow', '--blue'].map((c, i) => {
+    const s = el('div', { class: 'tsheet', style: `color:var(${c});transform:translateY(${dist}px)` });
+    s.innerHTML = `<svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="none" style="height:${Wv}px" aria-hidden="true"><path d="${CREST}V120H0Z" fill="currentColor"/><path d="${CREST}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+    s.firstElementChild.animate([{ transform: 'translateX(-3%)' }, { transform: 'translateX(3%)' }],
+      { duration: 1500 + i * 250, direction: i % 2 ? 'alternate-reverse' : 'alternate', iterations: Infinity, easing: 'ease-in-out' });
+    fx.append(s);
+    return s;
   });
-  nxt.style.transformOrigin = `${x}px ${y}px`;
-  return nxt.animate([
-    { opacity: 0, filter: 'blur(16px) sepia(1) brightness(1.9) saturate(.3)', transform: 'perspective(900px) rotateX(-8deg) scale(1.1)' },
-    { opacity: 1, filter: 'blur(8px) sepia(.8) brightness(1.4) saturate(.6)', transform: 'perspective(900px) rotateX(-4deg) scale(1.05)', offset: .45 },
-    { opacity: 1, filter: 'none', transform: 'none' }],
-    { duration: 1050, easing: 'ease-out', delay: 180, fill: 'backwards' }).finished;
+  let lab = null;
+  try {
+    const enter = Promise.all(sheets.map((s, i) => settled(s.animate(
+      [{ transform: `translateY(${dist}px)` }, { transform: 'translateY(0px)' }],
+      { duration: 560, delay: i * 80, easing: EI, fill: 'both' }))));
+    await sleep(430);
+    lab = el('div', { class: 'tlabel' },
+      el('div', { class: 'mask' }, el('b', { text: TITLES[nxt.id] || '' })),
+      el('div', { class: 'cap', 'aria-hidden': 'true', text: '🎓' }));
+    fx.append(lab);
+    const word = lab.querySelector('b'), capEl = lab.querySelector('.cap');
+    const wordIn = settled(word.animate([{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }],
+      { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }));
+    capEl.animate([{ transform: 'scale(0) rotate(-40deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(8deg)', opacity: 1, offset: .65 }, { transform: 'scale(1) rotate(0)', opacity: 1 }],
+      { duration: 520, delay: 160, easing: 'ease-out', fill: 'both' });
+    await Promise.all([enter, wordIn]);
+    hide.cancel();
+    await sleep(200);
+    word.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-110%)' }], { duration: 360, easing: EI, fill: 'both' });
+    capEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, fill: 'both' });
+    [...nxt.querySelectorAll(':scope > .page > *, :scope > .splash > *')].forEach((k, i) => k.animate(
+      [{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }],
+      { duration: 620, delay: 300 + i * 70, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
+    await Promise.all(sheets.map((s, i) => settled(s.animate(
+      [{ transform: 'translateY(0px)' }, { transform: `translateY(${-dist}px)` }],
+      { duration: 640, delay: (2 - i) * 80, easing: EO, fill: 'both' }))));
+  } finally {
+    hide.cancel();
+    sheets.forEach(s => s.remove());
+    if (lab) lab.remove();
+  }
 }
-
 function show(id) {
   if (id === current) return;
   if (busy) { pending = id; return; }
