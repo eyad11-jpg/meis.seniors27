@@ -215,9 +215,26 @@
         <p class="hand boxhead">Manager door 🛡️</p>
         <label class="field"><span>Manager code</span>
           <input name="acode" type="password" inputmode="numeric" maxlength="12" required placeholder="• • • • • •"></label>
-        <button class="go" type="submit" id="adminbtn">Let me in</button>
-        <p class="msg" id="adminmsg" role="status"></p>
-        <button class="linkbtn" id="adminback" type="button">← never mind</button>
+      <button class="go" type="submit" id="readbtn">Open my mailbox 🔑</button>
+        <p class="msg" id="readmsg" role="status"></p>
+        <button class="linkbtn" id="adminlink" type="button">I'm the manager 🛡️</button>
+        
+        <!-- زود السطر ده هنا -->
+        <button class="linkbtn" id="gotocodepage" type="button">Change my code 🔐</button>
+      </form>
+
+      <!-- وزود الفورم ده تحت الـ form القديم مباشرة -->
+      <form id="changecodeform" hidden autocomplete="off">
+        <p class="hand boxhead">Change your secret code 🔐</p>
+        <label class="field"><span>I am…</span>
+          <select id="ccname" name="name" required><option value="">Select your name…</option></select></label>
+        <label class="field"><span>Old secret code</span>
+          <input name="oldCode" type="password" inputmode="numeric" maxlength="6" required placeholder="• • • •"></label>
+        <label class="field"><span>New secret code</span>
+          <input name="newCode" type="password" inputmode="numeric" maxlength="6" required placeholder="• • • •"></label>
+        <button class="go" type="submit" id="changecodebtn">Save new code 🚀</button>
+        <p class="msg" id="changecodemsg" role="status"></p>
+        <button class="linkbtn" id="changecodeback" type="button">← back</button>
       </form>
 
       <div id="box" hidden>
