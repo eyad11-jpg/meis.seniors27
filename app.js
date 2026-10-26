@@ -423,6 +423,7 @@ function initPeople() {
         const first = p.name ? p.name.split(/\s+/)[0] : '';
         const front = el('div', { class: 'face front' }, el('figure', { class: 'polaroid' }, fph, el('figcaption', { text: p.name })));
         const back = el('div', { class: 'face back' }, el('figure', { class: 'polaroid' }, bph, el('figcaption', { text: 'Little ' + first })));
+
         const b = el('button', { class: 'pcard', type: 'button', 'aria-pressed': 'false', 'data-name': p.name ? p.name.toLowerCase() : '', 'aria-label': (p.name || '') + '. Tap to flip and see the baby photo.' }, el('div', { class: 'inner' }, front, back));
         
         b.addEventListener('click', () => { pop(); b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); });
