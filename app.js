@@ -547,12 +547,63 @@ let mailBuilt = false;
 function initMail() {
   if (mailBuilt) return; mailBuilt = true;
   if (!api()) $('#mailclosed').hidden = false;
-  loadNames().then(l => { fillSelect($('#to'), l, 'pick a victim…'); fillSelect($('#who'), l, 'pick your name…'); });
+ loadNames().then(l => { 
+    fillSelect($('#to'), l, 'pick a victim…'); 
+    fillSelect($('#who'), l, 'pick your name…'); 
+    fillSelect($('#ccname'), l, 'Select your name…'); // السطر ده عشان الأسماء تظهر في قائمة تغيير الكود
+  });
+  
   const tabw = $('#tabw'), tabr = $('#tabr');
   const tab = w => { tabw.setAttribute('aria-pressed', String(w)); tabr.setAttribute('aria-pressed', String(!w)); $('#panelw').hidden = !w; $('#panelr').hidden = w; pop(); };
   tabw.onclick = () => tab(true); tabr.onclick = () => tab(false);
   const say = (id, t, ok) => { const m = $(id); m.textContent = t; m.classList.toggle('ok', !!ok); };
 
+  // --- كود تغيير الكود هنا ---
+  const gotocodepage = $('#gotocodepage');
+  const changecodeform = $('#changecodeform');
+  const changecodeback = $('#changecodeback');
+  
+  if (gotocodepage) {
+    gotocodepage.onclick = () => {
+      $('#readform').hidden = true;
+      changecodeform.hidden = false;
+    };
+  }
+  if (changecodeback) {
+    changecodeback.onclick = () => {
+      changecodeform.hidden = true;
+      $('#readform').hidden = false;
+    };
+  }
+  if (changecodeform) {
+    changecodeform.onsubmit = async (e) => {
+      e.preventDefault();
+      const msgEl = $('#changecodemsg');
+      msgEl.textContent = 'Updating your code... ⏳';
+      const formData = new FormData(changecodeform);
+      try {
+        const j = await post({
+          a: 'change_code',
+          name: formData.get('name'),
+          oldCode: formData.get('oldCode'),
+          newCode: formData.get('newCode')
+        });
+        if (j.ok) {
+          msgEl.textContent = '✅ Code changed successfully! Use your new code now.';
+          changecodeform.reset();
+          setTimeout(() => {
+            changecodeform.hidden = true;
+            $('#readform').hidden = false;
+            msgEl.textContent = '';
+          }, 2500);
+        } else {
+          msgEl.textContent = j.error === 'wrong_code' ? '❌ Wrong name or old code.' : '❌ Error updating code.';
+        }
+      } catch (err) {
+        msgEl.textContent = '❌ Connection failed.';
+      }
+    };
+  }
   $('#sendform').addEventListener('submit', async e => {
     e.preventDefault(); const f = e.target;
     if (!api()) return say('#sendmsg', "The post office isn't connected yet. Tell the admin!");
@@ -631,80 +682,3 @@ const start = hashId() || 'splash';
 history.replaceState({ id: start, d: 0 }, '', start === 'splash' ? location.pathname : '#' + start);
 if (start !== 'splash') { $('#splash').classList.remove('on'); $('#' + start).classList.add('on'); current = start; onEnter(start); }
 })();
-
-// ==========================================
-// منطق تغيير الكود (Change Code Logic)
-// ==========================================
-const gotocodepage = document.getElementById('gotocodepage');
-const changecodeform = document.getElementById('changecodeform');
-const readform = document.getElementById('readform');
-const changecodeback = document.getElementById('changecodeback');
-const ccnameSelect = document.getElementById('ccname');
-
-// الانتقال لصفحة تغيير الكود
-if (gotocodepage) {
-  gotocodepage.addEventListener('click', () => {
-    readform.hidden = true;
-    changecodeform.hidden = false;
-  });
-}
-
-// الرجوع لصفحة الدخول العادية
-if (changecodeback) {
-  changecodeback.addEventListener('click', () => {
-    changecodeform.hidden = true;
-    readform.hidden = false;
-  });
-}
-
-// إرسال طلب تغيير الكود للـ Google Apps Script
-if (changecodeform) {
-  changecodeform.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msgEl = document.getElementById('changecodemsg');
-    msgEl.textContent = 'Updating your code... ⏳';
-    
-    const formData = new FormData(changecodeform);
-    const payload = {
-      a: 'change_code',
-      name: formData.get('name'),
-      oldCode: formData.get('oldCode'),
-      newCode: formData.get('newCode')
-    };
-
-    try {
-      const response = await fetch(api(), {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
-      
-      if (result.ok) {
-        msgEl.textContent = '✅ Code changed successfully! Use your new code now.';
-        changecodeform.reset();
-        setTimeout(() => {
-          changecodeform.hidden = true;
-          readform.hidden = false;
-          msgEl.textContent = '';
-        }, 2500);
-      } else {
-        if (result.error === 'wrong_code') {
-          msgEl.textContent = '❌ Wrong name or old code. Check them and try again.';
-        } else {
-          msgEl.textContent = '❌ Error: ' + (result.error || 'Could not update code.');
-        }
-      }
-    } catch (err) {
-      msgEl.textContent = '❌ Connection failed. Check your internet.';
-    }
-  });
-}
-
-// نسخ الأسماء تلقائياً لقائمة تغيير الكود
-const whoSelect = document.getElementById('who');
-if (whoSelect && ccnameSelect) {
-  const observer = new MutationObserver(() => {
-    ccnameSelect.innerHTML = whoSelect.innerHTML;
-  });
-  observer.observe(whoSelect, { childList: true });
-}
