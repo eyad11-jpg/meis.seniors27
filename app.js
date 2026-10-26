@@ -543,6 +543,7 @@ async function loadNames() {
 function fillSelect(sel, list, ph) {
   sel.replaceChildren(el('option', { value: '', text: ph }), ...list.map(n => el('option', { value: n, text: n })));
 }
+
 let mailBuilt = false;
 function initMail() {
   if (mailBuilt) return; mailBuilt = true;
@@ -667,6 +668,7 @@ function initMail() {
     btn.disabled = false;
   });
 }
+  
 /* ============ SCREEN ENTER HOOKS ============ */
 function onEnter(id) {
   if (id === 'home') { const h = $('#meis'); (window.requestIdleCallback || (f => setTimeout(f, 150)))(() => enhance3D(h, "MEIS'27")); }
