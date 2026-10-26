@@ -705,3 +705,12 @@ if (changecodeform) {
     }
   });
 }
+// نسخ الأسماء تلقائياً لقائمة تغيير الكود
+const whoSelect = document.getElementById('who');
+const ccnameSelect = document.getElementById('ccname');
+if (whoSelect && ccnameSelect) {
+  const observer = new MutationObserver(() => {
+    ccnameSelect.innerHTML = whoSelect.innerHTML;
+  });
+  observer.observe(whoSelect, { childList: true });
+}
