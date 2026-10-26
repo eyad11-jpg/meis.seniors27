@@ -385,78 +385,71 @@ function convertDriveLink(url) {
 }
 
 function initPeople() {
-  const grid = $('#pgrid');
-  
-  if (!S.people || S.people.length === 0) {
-    grid.innerHTML = '<p class="hand">Loading legends...</p>';
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        S.people = data.map(item => ({
-          name: item['Name'],
-          photo: convertDriveLink(item['Old or current you']),
-          baby: convertDriveLink(item['Baby you'])
-        }));
-        peopleBuilt = false; 
-        initPeople();
-      })
-      .catch(err => {
-        console.error(err);
-        grid.innerHTML = '<p class="hand">Failed to load legends.</p>';
-      });
-    return;
-  }
-
   if (peopleBuilt) return; 
   peopleBuilt = true;
   
-  grid.innerHTML = '';
-  const list = S.people.map(p => typeof p === 'string' ? { name: p } : p);
-  
-  if (!list.length) { 
-    grid.append(el('p', { class: 'hand', text: 'WANTED: everyone. Names coming soon.' })); 
-    return; 
-  }
-  
-  list.forEach((p, i) => {
-    const sl = p.file || slug(p.name) || ('person-' + (i + 1));
-    const fph = el('div', { class: 'ph' }), bph = el('div', { class: 'ph' });
-    
-    const faceUrls = p.photo ? (p.photo.startsWith('http') ? [p.photo] : [path(p.photo, 'people')]) : EXTS.map(e => `people/${sl}.${e}`);
-    const babyUrls = p.baby ? (p.baby.startsWith('http') ? [p.baby] : [path(p.baby, 'people')]) : EXTS.map(e => `people/${sl}-baby.${e}`);
-    
-    const ini = p.name ? p.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??';
-    const initFill = () => { fph.classList.add('init'); fph.classList.remove('empty'); fph.style.setProperty('--bg', BGS[i % BGS.length]); fph.replaceChildren(el('b', { class: 'ini', text: ini }), el('small', { text: 'photo: soon' })); };
-    
-    fillImg(fph, faceUrls, initFill);
-    fillImg(bph, babyUrls, () => emptyFill(bph, i, 'baby photo still developing 🍼'));
-    
-    const first = p.name ? p.name.split(/\s+/)[0] : '';
-    const front = el('div', { class: 'face front' }, el('figure', { class: 'polaroid' }, fph, el('figcaption', { text: p.name })));
-    const back = el('div', { class: 'face back' }, el('figure', { class: 'polaroid' }, bph, el('figcaption', { text: 'baby ' + first })));
-    const b = el('button', { class: 'pcard', type: 'button', 'aria-pressed': 'false', 'data-name': p.name ? p.name.toLowerCase() : '', 'aria-label': (p.name || '') + '. Tap to flip and see the baby photo.' }, el('div', { class: 'inner' }, front, back));
-    
-    b.addEventListener('click', () => { pop(); b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); });
-    grid.append(b);
-  });
-  
-  const searchInput = $('#psearch');
-  if (searchInput && !searchInput.dataset.bound) {
-    searchInput.dataset.bound = 'true';
-    searchInput.addEventListener('input', e => {
-      const q = e.target.value.trim().toLowerCase(); 
-      let any = false;
-      grid.querySelectorAll('.pcard').forEach(c => { 
-        const ok = !q || c.dataset.name.includes(q); 
-        c.hidden = !ok; 
-        if (ok) any = true; 
-      });
-      const noneMsg = $('#pnone');
-      if (noneMsg) noneMsg.hidden = any;
-    });
-  }
-}
+  const grid = $('#pgrid');
+  grid.innerHTML = '<p class="hand">Loading legends...</p>';
 
+  fetch('data.json')
+    .then(res => res.json())
+    .then(data => {
+      grid.innerHTML = '';
+      
+      const list = data.map(item => ({
+        name: item['Name'],
+        photo: convertDriveLink(item['Old or current you']),
+        baby: convertDriveLink(item['Baby you'])
+      }));
+
+      if (!list.length) { 
+        grid.append(el('p', { class: 'hand', text: 'WANTED: everyone. Names coming soon.' })); 
+        return; 
+      }
+      
+      list.forEach((p, i) => {
+        const sl = p.file || slug(p.name) || ('person-' + (i + 1));
+        const fph = el('div', { class: 'ph' }), bph = el('div', { class: 'ph' });
+        
+        const faceUrls = p.photo ? [p.photo] : EXTS.map(e => `people/${sl}.${e}`);
+        const babyUrls = p.baby ? [p.baby] : EXTS.map(e => `people/${sl}-baby.${e}`);
+        
+        const ini = p.name ? p.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??';
+        const initFill = () => { fph.classList.add('init'); fph.classList.remove('empty'); fph.style.setProperty('--bg', BGS[i % BGS.length]); fph.replaceChildren(el('b', { class: 'ini', text: ini }), el('small', { text: 'photo: soon' })); };
+        
+        fillImg(fph, faceUrls, initFill);
+        fillImg(bph, babyUrls, () => emptyFill(bph, i, 'baby photo still developing 🍼'));
+        
+        const first = p.name ? p.name.split(/\s+/)[0] : '';
+        const front = el('div', { class: 'face front' }, el('figure', { class: 'polaroid' }, fph, el('figcaption', { text: p.name })));
+        const back = el('div', { class: 'face back' }, el('figure', { class: 'polaroid' }, bph, el('figcaption', { text: 'baby ' + first })));
+        const b = el('button', { class: 'pcard', type: 'button', 'aria-pressed': 'false', 'data-name': p.name ? p.name.toLowerCase() : '', 'aria-label': (p.name || '') + '. Tap to flip and see the baby photo.' }, el('div', { class: 'inner' }, front, back));
+        
+        b.addEventListener('click', () => { pop(); b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); });
+        grid.append(b);
+      });
+      
+      const searchInput = $('#psearch');
+      if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = 'true';
+        searchInput.addEventListener('input', e => {
+          const q = e.target.value.trim().toLowerCase(); 
+          let any = false;
+          grid.querySelectorAll('.pcard').forEach(c => { 
+            const ok = !q || c.dataset.name.includes(q); 
+            c.hidden = !ok; 
+            if (ok) any = true; 
+          });
+          const noneMsg = $('#pnone');
+          if (noneMsg) noneMsg.hidden = any;
+        });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      grid.innerHTML = '<p class="hand">Failed to load legends.</p>';
+    });
+}
 /* ============ TRIPS ============ */
 let tripsBuilt = false;
 function initTrips() {
