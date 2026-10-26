@@ -411,19 +411,36 @@ function initPeople() {
         const sl = p.file || slug(p.name) || ('person-' + (i + 1));
         const fph = el('div', { class: 'ph' }), bph = el('div', { class: 'ph' });
         
-        const faceUrls = p.photo ? [p.photo] : EXTS.map(e => `people/${sl}.${e}`);
-        const babyUrls = p.baby ? [p.baby] : EXTS.map(e => `people/${sl}-baby.${e}`);
-        
-        const ini = p.name ? p.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??';
-        const initFill = () => { fph.classList.add('init'); fph.classList.remove('empty'); fph.style.setProperty('--bg', BGS[i % BGS.length]); fph.replaceChildren(el('b', { class: 'ini', text: ini }), el('small', { text: 'photo: soon' })); };
-        
-        fillImg(fph, faceUrls, initFill);
-        fillImg(bph, babyUrls, () => emptyFill(bph, i, 'baby photo still developing 🍼'));
+        // عرض صورة الكبر مباشرة لو موجودة، وإلا استخدام الـ Fallback
+        if (p.photo) {
+          fph.style.backgroundImage = `url('${p.photo}')`;
+          fph.style.backgroundSize = 'cover';
+          fph.style.backgroundPosition = 'center';
+        } else {
+          const faceUrls = EXTS.map(e => `people/${sl}.${e}`);
+          const ini = p.name ? p.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??';
+          const initFill = () => { 
+            fph.classList.add('init'); 
+            fph.classList.remove('empty'); 
+            fph.style.setProperty('--bg', BGS[i % BGS.length]); 
+            fph.replaceChildren(el('b', { class: 'ini', text: ini }), el('small', { text: 'photo: soon' })); 
+          };
+          fillImg(fph, faceUrls, initFill);
+        }
+
+        // عرض صورة الطفولة مباشرة لو موجودة
+        if (p.baby) {
+          bph.style.backgroundImage = `url('${p.baby}')`;
+          bph.style.backgroundSize = 'cover';
+          bph.style.backgroundPosition = 'center';
+        } else {
+          const babyUrls = EXTS.map(e => `people/${sl}-baby.${e}`);
+          fillImg(bph, babyUrls, () => emptyFill(bph, i, 'baby photo still developing 🍼'));
+        }
         
         const first = p.name ? p.name.split(/\s+/)[0] : '';
         const front = el('div', { class: 'face front' }, el('figure', { class: 'polaroid' }, fph, el('figcaption', { text: p.name })));
         const back = el('div', { class: 'face back' }, el('figure', { class: 'polaroid' }, bph, el('figcaption', { text: 'Little ' + first })));
-
         const b = el('button', { class: 'pcard', type: 'button', 'aria-pressed': 'false', 'data-name': p.name ? p.name.toLowerCase() : '', 'aria-label': (p.name || '') + '. Tap to flip and see the baby photo.' }, el('div', { class: 'inner' }, front, back));
         
         b.addEventListener('click', () => { pop(); b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); });
