@@ -544,13 +544,16 @@ function fillSelect(sel, list, ph) {
   sel.replaceChildren(el('option', { value: '', text: ph }), ...list.map(n => el('option', { value: n, text: n })));
 }
 let mailBuilt = false;
+let mailBuilt = false;
 function initMail() {
   if (mailBuilt) return; mailBuilt = true;
   if (!api()) $('#mailclosed').hidden = false;
- loadNames().then(l => { 
+  
+  loadNames().then(l => { 
     fillSelect($('#to'), l, 'pick a victim…'); 
     fillSelect($('#who'), l, 'pick your name…'); 
-    fillSelect($('#ccname'), l, 'Select your name…'); // السطر ده عشان الأسماء تظهر في قائمة تغيير الكود
+    const cc = $('#ccname'); 
+    if (cc) fillSelect(cc, l, 'Select your name…'); 
   });
   
   const tabw = $('#tabw'), tabr = $('#tabr');
@@ -558,28 +561,30 @@ function initMail() {
   tabw.onclick = () => tab(true); tabr.onclick = () => tab(false);
   const say = (id, t, ok) => { const m = $(id); m.textContent = t; m.classList.toggle('ok', !!ok); };
 
-  // --- كود تغيير الكود هنا ---
+  // --- كود تغيير الكود الآمن ---
   const gotocodepage = $('#gotocodepage');
   const changecodeform = $('#changecodeform');
   const changecodeback = $('#changecodeback');
   
-  if (gotocodepage) {
+  if (gotocodepage && changecodeform) {
     gotocodepage.onclick = () => {
-      $('#readform').hidden = true;
+      const readform = $('#readform');
+      if (readform) readform.hidden = true;
       changecodeform.hidden = false;
     };
   }
-  if (changecodeback) {
+  if (changecodeback && changecodeform) {
     changecodeback.onclick = () => {
       changecodeform.hidden = true;
-      $('#readform').hidden = false;
+      const readform = $('#readform');
+      if (readform) readform.hidden = false;
     };
   }
   if (changecodeform) {
     changecodeform.onsubmit = async (e) => {
       e.preventDefault();
       const msgEl = $('#changecodemsg');
-      msgEl.textContent = 'Updating your code... ⏳';
+      if (msgEl) msgEl.textContent = 'Updating your code... ⏳';
       const formData = new FormData(changecodeform);
       try {
         const j = await post({
@@ -589,21 +594,23 @@ function initMail() {
           newCode: formData.get('newCode')
         });
         if (j.ok) {
-          msgEl.textContent = '✅ Code changed successfully! Use your new code now.';
+          if (msgEl) msgEl.textContent = '✅ Code changed successfully! Use your new code now.';
           changecodeform.reset();
           setTimeout(() => {
             changecodeform.hidden = true;
-            $('#readform').hidden = false;
-            msgEl.textContent = '';
+            const readform = $('#readform');
+            if (readform) readform.hidden = false;
+            if (msgEl) msgEl.textContent = '';
           }, 2500);
         } else {
-          msgEl.textContent = j.error === 'wrong_code' ? '❌ Wrong name or old code.' : '❌ Error updating code.';
+          if (msgEl) msgEl.textContent = j.error === 'wrong_code' ? '❌ Wrong name or old code.' : '❌ Error updating code.';
         }
       } catch (err) {
-        msgEl.textContent = '❌ Connection failed.';
+        if (msgEl) msgEl.textContent = '❌ Connection failed.';
       }
     };
   }
+
   $('#sendform').addEventListener('submit', async e => {
     e.preventDefault(); const f = e.target;
     if (!api()) return say('#sendmsg', "The post office isn't connected yet. Tell the admin!");
@@ -660,12 +667,6 @@ function initMail() {
     catch (err) { say('#adminmsg', 'The pigeon got lost. Try again.'); }
     btn.disabled = false;
   });
-}
-function flyEnvelope(from) {
-  if (REDUCED) return;
-  const r = from.getBoundingClientRect(), n = el('div', { class: 'env', text: '✉️', style: `left:${r.left + r.width / 2 - 22}px;top:${r.top}px` });
-  document.body.append(n);
-  n.animate([{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(120px,-300px) rotate(35deg) scale(.3)', opacity: 0 }], { duration: 1100, easing: 'ease-in' }).onfinish = () => n.remove();
 }
 /* ============ SCREEN ENTER HOOKS ============ */
 function onEnter(id) {
