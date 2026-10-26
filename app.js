@@ -525,6 +525,16 @@ async function loadNames() {
   if (names) return names;
   let list = [];
   if (api()) { try { const r = await fetch(api() + '?a=names'); const j = await r.json(); if (j.ok && Array.isArray(j.names)) list = j.names; } catch (e) {} }
+  
+  // سحب الأسماء مباشرة من data.json (البيانات اللي جاية من الفورم والشيت)
+  if (!list.length) {
+    try {
+      const res = await fetch('data.json');
+      const data = await res.json();
+      list = data.map(item => item['Name']).filter(Boolean);
+    } catch (e) {}
+  }
+
   if (!list.length) list = (S.people || []).map(p => typeof p === 'string' ? p : p.name);
   return names = list;
 }
@@ -604,7 +614,6 @@ function flyEnvelope(from) {
   document.body.append(n);
   n.animate([{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(120px,-300px) rotate(35deg) scale(.3)', opacity: 0 }], { duration: 1100, easing: 'ease-in' }).onfinish = () => n.remove();
 }
-
 /* ============ SCREEN ENTER HOOKS ============ */
 function onEnter(id) {
   if (id === 'home') { const h = $('#meis'); (window.requestIdleCallback || (f => setTimeout(f, 150)))(() => enhance3D(h, "MEIS'27")); }
