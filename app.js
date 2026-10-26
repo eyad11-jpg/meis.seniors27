@@ -544,7 +544,6 @@ function fillSelect(sel, list, ph) {
   sel.replaceChildren(el('option', { value: '', text: ph }), ...list.map(n => el('option', { value: n, text: n })));
 }
 let mailBuilt = false;
-let mailBuilt = false;
 function initMail() {
   if (mailBuilt) return; mailBuilt = true;
   if (!api()) $('#mailclosed').hidden = false;
