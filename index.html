@@ -211,18 +211,15 @@
         <button class="linkbtn" id="adminlink" type="button">I'm the manager 🛡️</button>
       </form>
 
-      <form id="adminform" hidden autocomplete="off">
-        <p class="hand boxhead">Manager door 🛡️</p>
-        <label class="field"><span>Manager code</span>
-          <input name="acode" type="password" inputmode="numeric" maxlength="12" required placeholder="• • • • • •"></label>
-      <button class="go" type="submit" id="readbtn">Open my mailbox 🔑</button>
-        <p class="msg" id="readmsg" role="status"></p>
-        <button class="linkbtn" id="adminlink" type="button">I'm the manager 🛡️</button>
-        
-        <!-- زود السطر ده هنا -->
-        <button class="linkbtn" id="gotocodepage" type="button">Change my code 🔐</button>
-      </form>
-
+     <form id="adminform" hidden autocomplete="off">
+     <p class="hand boxhead">Manager door 🛡️</p>
+     <label class="field"><span>Manager code</span>
+       <input name="acode" type="password" inputmode="numeric" maxlength="12" required placeholder="• • • • • •"></label>
+     <button class="go" type="submit" id="adminbtn">Open manager view 🛡️</button>
+     <p class="msg" id="adminmsg" role="status"></p>
+     <button class="linkbtn" id="adminback" type="button">← back</button>
+     <button class="linkbtn" id="gotocodepage" type="button">Change my code 🔐</button>
+   </form>
       <!-- وزود الفورم ده تحت الـ form القديم مباشرة -->
       <form id="changecodeform" hidden autocomplete="off">
         <p class="hand boxhead">Change your secret code 🔐</p>
