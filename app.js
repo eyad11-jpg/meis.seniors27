@@ -631,3 +631,77 @@ const start = hashId() || 'splash';
 history.replaceState({ id: start, d: 0 }, '', start === 'splash' ? location.pathname : '#' + start);
 if (start !== 'splash') { $('#splash').classList.remove('on'); $('#' + start).classList.add('on'); current = start; onEnter(start); }
 })();
+
+// ==========================================
+// منطق تغيير الكود (Change Code Logic)
+// ==========================================
+const gotocodepage = document.getElementById('gotocodepage');
+const changecodeform = document.getElementById('changecodeform');
+const readform = document.getElementById('readform');
+const changecodeback = document.getElementById('changecodeback');
+const ccnameSelect = document.getElementById('ccname');
+
+// الانتقال لصفحة تغيير الكود
+if (gotocodepage) {
+  gotocodepage.addEventListener('click', () => {
+    readform.hidden = true;
+    changecodeform.hidden = false;
+  });
+}
+
+// الرجوع لصفحة الدخول العادية
+if (changecodeback) {
+  changecodeback.addEventListener('click', () => {
+    changecodeform.hidden = true;
+    readform.hidden = false;
+  });
+}
+
+// تعبئة قائمة الأسماء الخاصة بتغيير الكود تلقائياً (نفس أسماء الطلاب)
+// (هذا الكود يعتمد على دالة جلب الأسماء الموجودة أصلاً في مشروعك)
+if (typeof populateNames === 'function' && ccnameSelect) {
+  // إذا كانت الدالة الأصلية تجلب الأسماء، يمكنك تحديثها لتقوم بتعبئة #ccname أيضاً، أو نسخ الأسماء عند تحميل الصفحة
+}
+
+// إرسال طلب تغيير الكود للـ Google Apps Script
+if (changecodeform) {
+  changecodeform.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('changecodemsg');
+    msgEl.textContent = 'Updating your code... ⏳';
+    
+    const formData = new FormData(changecodeform);
+    const payload = {
+      a: 'change_code',
+      name: formData.get('name'),
+      oldCode: formData.get('oldCode'),
+      newCode: formData.get('newCode')
+    };
+
+    try {
+      const response = await fetch(mailApi, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      
+      if (result.ok) {
+        msgEl.textContent = '✅ Code changed successfully! Use your new code now.';
+        changecodeform.reset();
+        setTimeout(() => {
+          changecodeform.hidden = true;
+          readform.hidden = false;
+          msgEl.textContent = '';
+        }, 2500);
+      } else {
+        if (result.error === 'wrong_code') {
+          msgEl.textContent = '❌ Wrong name or old code. Check them and try again.';
+        } else {
+          msgEl.textContent = '❌ Error: ' + (result.error || 'Could not update code.');
+        }
+      }
+    } catch (err) {
+      msgEl.textContent = '❌ Connection failed. Check your internet.';
+    }
+  });
+}
