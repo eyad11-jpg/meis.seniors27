@@ -657,12 +657,6 @@ if (changecodeback) {
   });
 }
 
-// تعبئة قائمة الأسماء الخاصة بتغيير الكود تلقائياً (نفس أسماء الطلاب)
-// (هذا الكود يعتمد على دالة جلب الأسماء الموجودة أصلاً في مشروعك)
-if (typeof populateNames === 'function' && ccnameSelect) {
-  // إذا كانت الدالة الأصلية تجلب الأسماء، يمكنك تحديثها لتقوم بتعبئة #ccname أيضاً، أو نسخ الأسماء عند تحميل الصفحة
-}
-
 // إرسال طلب تغيير الكود للـ Google Apps Script
 if (changecodeform) {
   changecodeform.addEventListener('submit', async (e) => {
@@ -679,7 +673,7 @@ if (changecodeform) {
     };
 
     try {
-      const response = await fetch(mailApi, {
+      const response = await fetch(api(), {
         method: 'POST',
         body: JSON.stringify(payload)
       });
@@ -705,9 +699,9 @@ if (changecodeform) {
     }
   });
 }
+
 // نسخ الأسماء تلقائياً لقائمة تغيير الكود
 const whoSelect = document.getElementById('who');
-const ccnameSelect = document.getElementById('ccname');
 if (whoSelect && ccnameSelect) {
   const observer = new MutationObserver(() => {
     ccnameSelect.innerHTML = whoSelect.innerHTML;
