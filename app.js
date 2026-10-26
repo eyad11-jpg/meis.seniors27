@@ -547,25 +547,44 @@ function fillSelect(sel, list, ph) {
 let mailBuilt = false;
 function initMail() {
   if (mailBuilt) return; mailBuilt = true;
-  if (!api()) $('#mailclosed').hidden = false;
-  
+  if (!api()) {
+    const mailclosed = $('#mailclosed');
+    if (mailclosed) mailclosed.hidden = false;
+  }
+
   loadNames().then(l => { 
     fillSelect($('#to'), l, 'pick a victim…'); 
     fillSelect($('#who'), l, 'pick your name…'); 
     const cc = $('#ccname'); 
     if (cc) fillSelect(cc, l, 'Select your name…'); 
   });
-  
+
   const tabw = $('#tabw'), tabr = $('#tabr');
-  const tab = w => { tabw.setAttribute('aria-pressed', String(w)); tabr.setAttribute('aria-pressed', String(!w)); $('#panelw').hidden = !w; $('#panelr').hidden = w; pop(); };
-  tabw.onclick = () => tab(true); tabr.onclick = () => tab(false);
-  const say = (id, t, ok) => { const m = $(id); m.textContent = t; m.classList.toggle('ok', !!ok); };
+  if (tabw && tabr) {
+    const tab = w => { 
+      tabw.setAttribute('aria-pressed', String(w)); 
+      tabr.setAttribute('aria-pressed', String(!w)); 
+      const pw = $('#panelw'), pr = $('#panelr'); 
+      if (pw) pw.hidden = !w; 
+      if (pr) pr.hidden = w; 
+      pop(); 
+    };
+    tabw.onclick = () => tab(true); 
+    tabr.onclick = () => tab(false);
+  }
+  const say = (id, t, ok) => { 
+    const m = $(id); 
+    if (m) { 
+      m.textContent = t; 
+      m.classList.toggle('ok', !!ok); 
+    } 
+  };
 
   // --- كود تغيير الكود الآمن ---
   const gotocodepage = $('#gotocodepage');
   const changecodeform = $('#changecodeform');
   const changecodeback = $('#changecodeback');
-  
+
   if (gotocodepage && changecodeform) {
     gotocodepage.onclick = () => {
       const readform = $('#readform');
@@ -611,62 +630,97 @@ function initMail() {
     };
   }
 
-  $('#sendform').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target;
-    if (!api()) return say('#sendmsg', "The post office isn't connected yet. Tell the admin!");
-    const to = f.to.value, text = f.text.value.trim(); if (!to || !text) return say('#sendmsg', 'Pick a name and write something nice.');
-    const btn = $('#sendbtn'); btn.disabled = true; say('#sendmsg', 'sending…');
-    try {
-      const j = await post({ a: 'send', to, text, from: f.from.value.trim(), hp: f.hp.value });
-      if (j.ok) {
-        say('#sendmsg', f.from.value.trim() ? 'Delivered. They will know it was you. 💌' : 'Delivered. They will never know it was you. 🕵️', true);
-        f.text.value = ''; flyEnvelope(btn); tone(660, .2, 'triangle', .06, 400);
-      } else say('#sendmsg', j.error === 'noname' ? "That name isn't on the list. Pick again?" : 'The pigeon dropped it. Try again.');
-    } catch (err) { say('#sendmsg', 'The pigeon got lost. Check your internet and try again.'); }
-    btn.disabled = false;
-  });
+  const sendform = $('#sendform');
+  if (sendform) {
+    sendform.addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target;
+      if (!api()) return say('#sendmsg', "The post office isn't connected yet. Tell the admin!");
+      const to = f.to.value, text = f.text.value.trim(); if (!to || !text) return say('#sendmsg', 'Pick a name and write something nice.');
+      const btn = $('#sendbtn'); if (btn) btn.disabled = true; say('#sendmsg', 'sending…');
+      try {
+        const j = await post({ a: 'send', to, text, from: f.from.value.trim(), hp: f.hp.value });
+        if (j.ok) {
+          say('#sendmsg', f.from.value.trim() ? 'Delivered. They will know it was you. 💌' : 'Delivered. They will never know it was you. 🕵️', true);
+          f.text.value = ''; if (btn) flyEnvelope(btn); tone(660, .2, 'triangle', .06, 400);
+        } else say('#sendmsg', j.error === 'noname' ? "That name isn't on the list. Pick again?" : 'The pigeon dropped it. Try again.');
+      } catch (err) { say('#sendmsg', 'The pigeon got lost. Check your internet and try again.'); }
+      if (btn) btn.disabled = false;
+    });
+  }
 
   const box = $('#box');
-  const lock = () => { box.hidden = true; $('#letters').replaceChildren(); $('#readform').hidden = false; $('#readform').code.value = ''; $('#adminform').acode.value = ''; adminCode = ''; say('#readmsg', ''); };
+  const lock = () => { 
+    if (box) box.hidden = true; 
+    const lts = $('#letters'); if (lts) lts.replaceChildren(); 
+    const rf = $('#readform'); if (rf) { rf.hidden = false; rf.code.value = ''; } 
+    const af = $('#adminform'); if (af) af.acode.value = ''; 
+    adminCode = ''; 
+    say('#readmsg', ''); 
+  };
   let adminCode = '';
-  $('#lockbtn').onclick = () => { pop(); lock(); };
-  $('#adminlink').onclick = () => { $('#readform').hidden = true; $('#adminform').hidden = false; };
-  $('#adminback').onclick = () => { $('#adminform').hidden = true; $('#readform').hidden = false; };
+
+  const lockbtn = $('#lockbtn');
+  if (lockbtn) lockbtn.onclick = () => { pop(); lock(); };
+
+  const adminlink = $('#adminlink');
+  if (adminlink) adminlink.onclick = () => { 
+    const rf = $('#readform'); if (rf) rf.hidden = true; 
+    const af = $('#adminform'); if (af) af.hidden = false; 
+  };
+
+  const adminback = $('#adminback');
+  if (adminback) adminback.onclick = () => { 
+    const af = $('#adminform'); if (af) af.hidden = true; 
+    const rf = $('#readform'); if (rf) rf.hidden = false; 
+  };
 
   const showLetters = (list, admin) => {
-    $('#readform').hidden = true; $('#adminform').hidden = true; box.hidden = false;
-    $('#boxhead').textContent = admin ? 'Manager view 🛡️ (all letters)' : 'Your mailbox. Eyes only. 👀';
-    const L = $('#letters'); L.replaceChildren();
-    if (!list.length) { L.append(el('p', { class: 'hand boxhead', text: admin ? 'No letters yet.' : "Nothing yet. Your mailbox is as empty as our group chat on exam day. Check again later." })); return; }
-    list.forEach(m => {
-      const meta = admin ? `to ${m.to} · from ${m.from || 'mystery person'} · ${m.when}` : `${m.from ? 'from ' + m.from : 'from a mystery person 🕵️'} · ${m.when}`;
-      const card = el('div', { class: 'letter' }, el('p', { class: 'txt', text: m.text }), el('p', { class: 'meta', text: meta }));
-      if (admin) card.append(el('button', { class: 'del', type: 'button', text: 'delete', onclick: async () => {
-        if (!confirm('Delete this letter for good?')) return;
-        try { const j = await post({ a: 'del', code: adminCode, id: m.id }); if (j.ok) { card.remove(); toast('Gone. Poof.'); } else toast("Couldn't delete that one."); } catch (e) { toast('The pigeon got lost.'); }
-      } }));
-      L.append(card);
-    });
+    const rf = $('#readform'); if (rf) rf.hidden = true; 
+    const af = $('#adminform'); if (af) af.hidden = true; 
+    if (box) box.hidden = false;
+    const boxhead = $('#boxhead');
+    if (boxhead) boxhead.textContent = admin ? 'Manager view 🛡️ (all letters)' : 'Your mailbox. Eyes only. 👀';
+    const L = $('#letters'); 
+    if (L) {
+      L.replaceChildren();
+      if (!list.length) { L.append(el('p', { class: 'hand boxhead', text: admin ? 'No letters yet.' : "Nothing yet. Your mailbox is as empty as our group chat on exam day. Check again later." })); return; }
+      list.forEach(m => {
+        const meta = admin ? `to ${m.to} · from ${m.from || 'mystery person'} · ${m.when}` : `${m.from ? 'from ' + m.from : 'from a mystery person 🕵️'} · ${m.when}`;
+        const card = el('div', { class: 'letter' }, el('p', { class: 'txt', text: m.text }), el('p', { class: 'meta', text: meta }));
+        if (admin) card.append(el('button', { class: 'del', type: 'button', text: 'delete', onclick: async () => {
+          if (!confirm('Delete this letter for good?')) return;
+          try { const j = await post({ a: 'del', code: adminCode, id: m.id }); if (j.ok) { card.remove(); toast('Gone. Poof.'); } else toast("Couldn't delete that one."); } catch (e) { toast('The pigeon got lost.'); }
+        } }));
+        L.append(card);
+      });
+    }
   };
   const errText = j => j.error === 'locked' ? 'Too many wrong tries. Cool off for 10 minutes ☕' : "That code doesn't open this mailbox. Check WhatsApp.";
 
-  $('#readform').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target;
-    if (!api()) return say('#readmsg', "The post office isn't connected yet.");
-    if (!f.who.value || !f.code.value) return say('#readmsg', 'Pick your name and type your code.');
-    const btn = $('#readbtn'); btn.disabled = true; say('#readmsg', 'knocking…');
-    try { const j = await post({ a: 'read', name: f.who.value, code: f.code.value }); if (j.ok) { say('#readmsg', ''); showLetters(j.messages || [], false); f.code.value = ''; } else say('#readmsg', errText(j)); }
-    catch (err) { say('#readmsg', 'The pigeon got lost. Try again.'); }
-    btn.disabled = false;
-  });
-  $('#adminform').addEventListener('submit', async e => {
-    e.preventDefault(); const f = e.target;
-    if (!api()) return say('#adminmsg', "The post office isn't connected yet.");
-    const btn = $('#adminbtn'); btn.disabled = true; say('#adminmsg', 'checking your badge…');
-    try { const j = await post({ a: 'admin', code: f.acode.value }); if (j.ok) { adminCode = f.acode.value; f.acode.value = ''; say('#adminmsg', ''); showLetters(j.messages || [], true); } else say('#adminmsg', errText(j)); }
-    catch (err) { say('#adminmsg', 'The pigeon got lost. Try again.'); }
-    btn.disabled = false;
-  });
+  const readform = $('#readform');
+  if (readform) {
+    readform.addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target;
+      if (!api()) return say('#readmsg', "The post office isn't connected yet.");
+      if (!f.who.value || !f.code.value) return say('#readmsg', 'Pick your name and type your code.');
+      const btn = $('#readbtn'); if (btn) btn.disabled = true; say('#readmsg', 'knocking…');
+      try { const j = await post({ a: 'read', name: f.who.value, code: f.code.value }); if (j.ok) { say('#readmsg', ''); showLetters(j.messages || [], false); f.code.value = ''; } else say('#readmsg', errText(j)); }
+      catch (err) { say('#readmsg', 'The pigeon got lost. Try again.'); }
+      if (btn) btn.disabled = false;
+    });
+  }
+
+  const adminform = $('#adminform');
+  if (adminform) {
+    adminform.addEventListener('submit', async e => {
+      e.preventDefault(); const f = e.target;
+      if (!api()) return say('#adminmsg', "The post office isn't connected yet.");
+      const btn = $('#adminbtn'); if (btn) btn.disabled = true; say('#adminmsg', 'checking your badge…');
+      try { const j = await post({ a: 'admin', code: f.acode.value }); if (j.ok) { adminCode = f.acode.value; f.acode.value = ''; say('#adminmsg', ''); showLetters(j.messages || [], true); } else say('#adminmsg', errText(j)); }
+      catch (err) { say('#adminmsg', 'The pigeon got lost. Try again.'); }
+      if (btn) btn.disabled = false;
+    });
+  }
 }
   
 /* ============ SCREEN ENTER HOOKS ============ */
