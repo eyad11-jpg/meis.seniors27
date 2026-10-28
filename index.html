@@ -22,87 +22,174 @@
 
 <main id="app">
 
-<!-- ============ MAINTENANCE OVERLAY WITH GAME ============ -->
-<div id="maintenance-mode" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0A1F4A; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; font-family: 'Manrope', sans-serif; padding: 20px; box-sizing: border-box; overflow: hidden;">
+<!-- ============ MAINTENANCE OVERLAY - MOBILE RAGE MAZE ============ -->
+<div id="maintenance-mode" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #070B19; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; font-family: 'Manrope', sans-serif; padding: 20px; box-sizing: border-box; overflow: hidden; user-select: none;">
   
-  <!-- Maintenance Text -->
-  <div style="font-size: 40px; margin-bottom: 10px;">🛠️</div>
-  <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0 0 10px 0; color: #FFC83D;">Site Under Maintenance</h1>
-  <p style="font-size: 1.1rem; max-width: 500px; line-height: 1.5; color: #A9D6F7; margin: 0 0 20px 0;">
-    Eyad is currently working on the website. Play this mini-game while you wait! 🎓
+  <div style="font-size: 45px; margin-bottom: 8px;" id="maze-icon">📱😈</div>
+  <h1 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 8px 0; color: #FF4D4D; text-transform: uppercase;" id="maze-title">
+    STAGE 1: CATCH ME
+  </h1>
+  <p style="font-size: 0.95rem; max-width: 320px; line-height: 1.4; color: #A9D6F7; margin: 0 0 20px 0;" id="maze-desc">
+    Eyad locked the site! Try to tap the runaway button to enter.
   </p>
 
-  <!-- Mini Game Container -->
-  <div id="game-container" style="position: relative; width: 320px; height: 350px; background: rgba(255, 255, 255, 0.08); border: 2px solid #A9D6F7; border-radius: 16px; overflow: hidden; touch-action: none; cursor: pointer;">
-    <div id="game-score" style="position: absolute; top: 12px; left: 16px; font-weight: bold; font-size: 18px; color: #FFC83D;">Score: 0</div>
-    <div id="basket" style="position: absolute; bottom: 10px; left: 130px; width: 60px; height: 30px; background: #FFC83D; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">🎓</div>
+  <!-- STAGE 1 CONTAINER (Mobile Box) -->
+  <div id="stage-1-box" style="position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
+    <button id="s1-btn" type="button" style="position: absolute; left: 70px; top: 55px; background: #FFC83D; color: #0A1F4A; border: none; padding: 12px 20px; font-weight: 800; font-size: 0.85rem; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,200,61,0.4);">
+      Tap to Bypass 🔓
+    </button>
   </div>
+
+  <!-- STAGE 2 CONTAINER (Split Buttons for Mobile) -->
+  <div id="stage-2-box" style="display: none; position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
+    <button id="s2-btn-left" type="button" style="position: absolute; left: 10px; top: 60px; background: #FF4D4D; color: white; border: none; padding: 10px 15px; font-weight: 800; font-size: 0.8rem; border-radius: 20px;">
+      اليمين 🔴
+    </button>
+    <button id="s2-btn-right" type="button" style="position: absolute; right: 10px; top: 60px; background: #4D7CFF; color: white; border: none; padding: 10px 15px; font-weight: 800; font-size: 0.8rem; border-radius: 20px;">
+      الشمال 🔵
+    </button>
+    <button id="s2-secret-btn" type="button" style="position: absolute; left: 120px; top: 62px; width: 35px; height: 35px; background: #FFC83D; border: none; border-radius: 50%; opacity: 0.4; font-size: 12px;">🔑</button>
+  </div>
+
+  <!-- STAGE 3 CONTAINER (Mobile Reverse Mirror) -->
+  <div id="stage-3-box" style="display: none; position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
+    <button id="s3-mirror-btn" type="button" style="position: absolute; left: 80px; top: 60px; background: #22C55E; color: white; border: none; padding: 10px 18px; font-weight: 800; font-size: 0.85rem; border-radius: 30px;">
+      🪞 زرار العكس
+    </button>
+  </div>
+
+  <!-- STAGE 4 CONTAINER (Fake Victory) -->
+  <div id="stage-4-box" style="display: none; flex-direction: column; align-items: center; gap: 12px;">
+    <div style="font-size: 35px;">🎉🥳</div>
+    <p style="color: #22C55E; font-weight: 800; font-size: 1rem; margin: 0;">عاش! خلصت كل ألغاز الموبايل!</p>
+    <button id="final-troll-btn" type="button" style="background: linear-gradient(135deg, #FFC83D, #FF4D4D); color: #0A1F4A; border: none; padding: 12px 24px; font-weight: 900; font-size: 1rem; border-radius: 30px; box-shadow: 0 4px 20px rgba(255,200,61,0.5);">
+      Enter Site Now 🔓
+    </button>
+  </div>
+
+  <!-- Feedback Message -->
+  <p id="maze-msg" style="margin-top: 15px; font-size: 0.85rem; color: #FFC83D; font-weight: 700; height: 22px;"></p>
 
   <script>
     (function() {
-      const container = document.getElementById('game-container');
-      const basket = document.getElementById('basket');
-      const scoreEl = document.getElementById('game-score');
-      let score = 0;
-      let basketX = 130;
-      const containerWidth = 320;
-      const basketWidth = 60;
+      const icon = document.getElementById('maze-icon');
+      const title = document.getElementById('maze-title');
+      const desc = document.getElementById('maze-desc');
+      const msg = document.getElementById('maze-msg');
 
-      // Move Basket with Mouse / Touch
-      function moveBasket(clientX) {
-        const rect = container.getBoundingClientRect();
-        let x = clientX - rect.left - (basketWidth / 2);
-        x = Math.max(0, Math.min(containerWidth - basketWidth, x));
-        basketX = x;
-        basket.style.left = basketX + 'px';
+      const s1Box = document.getElementById('stage-1-box');
+      const s1Btn = document.getElementById('s1-btn');
+
+      const s2Box = document.getElementById('stage-2-box');
+      const s2Left = document.getElementById('s2-btn-left');
+      const s2Right = document.getElementById('s2-btn-right');
+      const s2Secret = document.getElementById('s2-secret-btn');
+
+      const s3Box = document.getElementById('stage-3-box');
+      const s3Mirror = document.getElementById('s3-mirror-btn');
+
+      const s4Box = document.getElementById('stage-4-box');
+      const finalBtn = document.getElementById('final-troll-btn');
+
+      // STAGE 1 MOBILE LOGIC
+      let s1Count = 0;
+      let isS1Still = false;
+
+      function dodgeS1(e) {
+        if (isS1Still) return;
+        if(e) e.preventDefault();
+        s1Count++;
+        const maxX = s1Box.offsetWidth - s1Btn.offsetWidth;
+        const maxY = s1Box.offsetHeight - s1Btn.offsetHeight;
+        s1Btn.style.left = Math.floor(Math.random() * maxX) + 'px';
+        s1Btn.style.top = Math.floor(Math.random() * maxY) + 'px';
+
+        if (s1Count >= 4) {
+          msg.textContent = "صعبت عليا.. ثبت لـ 3 ثواني، اضغط بسرعة!";
+          isS1Still = true;
+          s1Btn.style.background = "#22C55E";
+          s1Btn.textContent = "دوس هنا بسرعة! 🎯";
+          setTimeout(() => {
+            if (s1Box.style.display !== 'none') {
+              isS1Still = false;
+              s1Btn.style.background = "#FFC83D";
+              s1Btn.textContent = "فاتك الوقت! 😜";
+              msg.textContent = "هرب تاني!";
+            }
+          }, 3000);
+        } else {
+          msg.textContent = "صوابعك سريعة بس مش أسرع مني! 😂";
+        }
       }
 
-      container.addEventListener('mousemove', e => moveBasket(e.clientX));
-      container.addEventListener('touchmove', e => {
-        if(e.touches.length > 0) moveBasket(e.touches[0].clientX);
+      s1Btn.addEventListener('touchstart', dodgeS1);
+      s1Btn.addEventListener('mouseover', dodgeS1);
+      s1Btn.addEventListener('click', () => {
+        if (isS1Still || s1Count >= 4) {
+          s1Box.style.display = 'none';
+          s2Box.style.display = 'block';
+          title.textContent = "STAGE 2: MOBILE TRAP";
+          desc.textContent = "الزرار اتقسم اثنين.. دور على مفتاح السر في النص!";
+          icon.textContent = "📱⚔️";
+          msg.textContent = "اضغط على النقطة الصفراء اللي في النص!";
+        }
       });
 
-      // Spawn Falling Items
-      function spawnItem() {
-        const item = document.createElement('div');
-        const items = ['🎓', '✨', '🎉', '📜', '⭐'];
-        const chosen = items[Math.floor(Math.random() * items.length)];
-        
-        item.textContent = chosen;
-        item.style.position = 'absolute';
-        item.style.top = '0px';
-        const startX = Math.random() * (containerWidth - 30);
-        item.style.left = startX + 'px';
-        item.style.fontSize = '24px';
-        item.style.userSelect = 'none';
-        container.appendChild(item);
+      // STAGE 2 MOBILE LOGIC
+      function dodgeS2(e) {
+        if(e) e.preventDefault();
+        const rect = s2Box.getBoundingClientRect();
+        const touchX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
 
-        let posY = 0;
-        const speed = 2 + Math.random() * 2.5;
-
-        const fall = setInterval(() => {
-          posY += speed;
-          item.style.top = posY + 'px';
-
-          // Collision Detection with Basket
-          if (posY >= 310 && posY <= 330) {
-            if (startX >= basketX - 20 && startX <= basketX + basketWidth) {
-              score += 10;
-              scoreEl.textContent = 'Score: ' + score;
-              item.remove();
-              clearInterval(fall);
-            }
-          }
-
-          // Remove if out of bounds
-          if (posY > 350) {
-            item.remove();
-            clearInterval(fall);
-          }
-        }, 20);
+        if (touchX < 140) {
+          s2Left.style.left = '5px';
+          s2Right.style.right = '5px';
+        } else {
+          s2Left.style.left = '130px';
+          s2Right.style.right = '130px';
+        }
+        msg.textContent = "بيجروا من صباعك! ركز في النص! 👀";
       }
 
-      setInterval(spawnItem, 800);
+      s2Box.addEventListener('touchmove', dodgeS2);
+      s2Box.addEventListener('mousemove', dodgeS2);
+
+      s2Secret.addEventListener('click', () => {
+        s2Box.style.display = 'none';
+        s3Box.style.display = 'block';
+        title.textContent = "STAGE 3: REVERSE TOUCH";
+        desc.textContent = "الزرار بيتحرك عكس اتجاه لمس صباعك تماماً!";
+        icon.textContent = "🪞";
+        msg.textContent = "المس عكس المكان اللي عايز تروحه!";
+      });
+
+      // STAGE 3 MOBILE LOGIC
+      s3Box.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const rect = s3Box.getBoundingClientRect();
+        const tX = e.touches[0].clientX - rect.left;
+        const tY = e.touches[0].clientY - rect.top;
+
+        const invX = Math.max(5, Math.min(180, 280 - tX - 70));
+        const invY = Math.max(5, Math.min(110, 160 - tY - 30));
+
+        s3Mirror.style.left = invX + 'px';
+        s3Mirror.style.top = invY + 'px';
+      });
+
+      s3Mirror.addEventListener('click', () => {
+        s3Box.style.display = 'none';
+        s4Box.style.display = 'flex';
+        title.textContent = "FINAL STAGE: VICTORY?";
+        desc.textContent = "خلصت كل تحديات الموبايل بنجاح!";
+        icon.textContent = "👑";
+        msg.textContent = "";
+      });
+
+      // STAGE 4 FINAL TROLL
+      finalBtn.addEventListener('click', () => {
+        alert("عاش يا وحش! حليت كل ألغاز الموبايل! 📱👏\n\nبس برضه الموقع مقفل وإياد بيمسيك التحية، استنى لما يخلص بقى! ☕😂");
+      });
     })();
   </script>
 </div>
