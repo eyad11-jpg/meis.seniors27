@@ -22,11 +22,89 @@
 
 <main id="app">
 
-<!-- ============ MAINTENANCE OVERLAY ============ -->
-<div id="maintenance-mode" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0A1F4A; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; font-family: 'Manrope', sans-serif; padding: 20px;">
-  <div style="font-size: 50px; margin-bottom: 20px;">🛠️</div>
-  <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; color: #FFC83D;">Site Under Maintenance</h1>
-  <p style="font-size: 1.2rem; max-width: 500px; line-height: 1.6; color: #A9D6F7;">Eyad is currently working on the website and adding new features. It will be back soon. Stay tuned!</p>
+<!-- ============ MAINTENANCE OVERLAY WITH GAME ============ -->
+<div id="maintenance-mode" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0A1F4A; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; font-family: 'Manrope', sans-serif; padding: 20px; box-sizing: border-box; overflow: hidden;">
+  
+  <!-- Maintenance Text -->
+  <div style="font-size: 40px; margin-bottom: 10px;">🛠️</div>
+  <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0 0 10px 0; color: #FFC83D;">Site Under Maintenance</h1>
+  <p style="font-size: 1.1rem; max-width: 500px; line-height: 1.5; color: #A9D6F7; margin: 0 0 20px 0;">
+    Eyad is currently working on the website. Play this mini-game while you wait! 🎓
+  </p>
+
+  <!-- Mini Game Container -->
+  <div id="game-container" style="position: relative; width: 320px; height: 350px; background: rgba(255, 255, 255, 0.08); border: 2px solid #A9D6F7; border-radius: 16px; overflow: hidden; touch-action: none; cursor: pointer;">
+    <div id="game-score" style="position: absolute; top: 12px; left: 16px; font-weight: bold; font-size: 18px; color: #FFC83D;">Score: 0</div>
+    <div id="basket" style="position: absolute; bottom: 10px; left: 130px; width: 60px; height: 30px; background: #FFC83D; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">🎓</div>
+  </div>
+
+  <script>
+    (function() {
+      const container = document.getElementById('game-container');
+      const basket = document.getElementById('basket');
+      const scoreEl = document.getElementById('game-score');
+      let score = 0;
+      let basketX = 130;
+      const containerWidth = 320;
+      const basketWidth = 60;
+
+      // Move Basket with Mouse / Touch
+      function moveBasket(clientX) {
+        const rect = container.getBoundingClientRect();
+        let x = clientX - rect.left - (basketWidth / 2);
+        x = Math.max(0, Math.min(containerWidth - basketWidth, x));
+        basketX = x;
+        basket.style.left = basketX + 'px';
+      }
+
+      container.addEventListener('mousemove', e => moveBasket(e.clientX));
+      container.addEventListener('touchmove', e => {
+        if(e.touches.length > 0) moveBasket(e.touches[0].clientX);
+      });
+
+      // Spawn Falling Items
+      function spawnItem() {
+        const item = document.createElement('div');
+        const items = ['🎓', '✨', '🎉', '📜', '⭐'];
+        const chosen = items[Math.floor(Math.random() * items.length)];
+        
+        item.textContent = chosen;
+        item.style.position = 'absolute';
+        item.style.top = '0px';
+        const startX = Math.random() * (containerWidth - 30);
+        item.style.left = startX + 'px';
+        item.style.fontSize = '24px';
+        item.style.userSelect = 'none';
+        container.appendChild(item);
+
+        let posY = 0;
+        const speed = 2 + Math.random() * 2.5;
+
+        const fall = setInterval(() => {
+          posY += speed;
+          item.style.top = posY + 'px';
+
+          // Collision Detection with Basket
+          if (posY >= 310 && posY <= 330) {
+            if (startX >= basketX - 20 && startX <= basketX + basketWidth) {
+              score += 10;
+              scoreEl.textContent = 'Score: ' + score;
+              item.remove();
+              clearInterval(fall);
+            }
+          }
+
+          // Remove if out of bounds
+          if (posY > 350) {
+            item.remove();
+            clearInterval(fall);
+          }
+        }, 20);
+      }
+
+      setInterval(spawnItem, 800);
+    })();
+  </script>
 </div>
   
 <!-- ============ FRONT DOOR ============ -->
