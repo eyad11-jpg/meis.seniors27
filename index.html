@@ -22,178 +22,61 @@
 
 <main id="app">
 
-<!-- ============ MAINTENANCE OVERLAY - MOBILE RAGE MAZE ============ -->
-<div id="maintenance-mode" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #070B19; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; font-family: 'Manrope', sans-serif; padding: 20px; box-sizing: border-box; overflow: hidden; user-select: none;">
+<!-- ============ MAINTENANCE OVERLAY - EYAD IS COOKING ============ -->
+<div id="maintenance-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #030712; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #FFFFFF; text-align: center; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; padding: 24px; box-sizing: border-box; user-select: none;">
   
-  <div style="font-size: 45px; margin-bottom: 8px;" id="maze-icon">📱😈</div>
-  <h1 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 8px 0; color: #FF4D4D; text-transform: uppercase;" id="maze-title">
-    STAGE 1: CATCH ME
-  </h1>
-  <p style="font-size: 0.95rem; max-width: 320px; line-height: 1.4; color: #A9D6F7; margin: 0 0 20px 0;" id="maze-desc">
-    Eyad locked the site! Try to tap the runaway button to enter.
+  <!-- Sleek Status Badge -->
+  <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); padding: 6px 16px; border-radius: 50px; font-size: 0.78rem; font-weight: 700; color: #60A5FA; margin-bottom: 24px; letter-spacing: 1.5px;">
+    ⚡ MEIS CLASS OF 2027 // SYSTEM UPDATE
+  </div>
+
+  <!-- Main Card Container -->
+  <div style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 32px 24px; max-width: 360px; width: 100%; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.4); margin-bottom: 24px;">
+    
+    <div style="font-size: 36px; margin-bottom: 16px;">👨‍🍳</div>
+    
+    <h1 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 10px 0; color: #F8FAFC; letter-spacing: -0.5px;">
+      Eyad is cooking...
+    </h1>
+    
+    <p style="font-size: 0.9rem; line-height: 1.6; color: #94A3B8; margin: 0 0 24px 0;">
+      We are upgrading the portal and packing it with the Class of 2027 archives. Stay tuned!
+    </p>
+
+    <!-- Professional Status Button -->
+    <button id="maintenance-status-btn" type="button" style="background: #2563EB; color: #FFFFFF; border: none; padding: 12px 24px; font-weight: 700; font-size: 0.88rem; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: background 0.2s;">
+      Check Status
+    </button>
+    
+    <div id="maintenance-msg" style="font-size: 0.8rem; color: #38BDF8; margin-top: 14px; height: 18px; transition: opacity 0.3s;"></div>
+
+  </div>
+
+  <!-- Footer Note -->
+  <p style="font-size: 0.78rem; color: #64748B; margin: 0; letter-spacing: 0.5px;">
+    MEIS // SECURE PLATFORM ENVIRONMENT
   </p>
-
-  <!-- STAGE 1 CONTAINER (Mobile Box) -->
-  <div id="stage-1-box" style="position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
-    <button id="s1-btn" type="button" style="position: absolute; left: 70px; top: 55px; background: #FFC83D; color: #0A1F4A; border: none; padding: 12px 20px; font-weight: 800; font-size: 0.85rem; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,200,61,0.4);">
-      Tap to Bypass 🔓
-    </button>
-  </div>
-
-  <!-- STAGE 2 CONTAINER (Split Buttons for Mobile) -->
-  <div id="stage-2-box" style="display: none; position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
-    <button id="s2-btn-left" type="button" style="position: absolute; left: 10px; top: 60px; background: #FF4D4D; color: white; border: none; padding: 10px 15px; font-weight: 800; font-size: 0.8rem; border-radius: 20px;">
-      اليمين 🔴
-    </button>
-    <button id="s2-btn-right" type="button" style="position: absolute; right: 10px; top: 60px; background: #4D7CFF; color: white; border: none; padding: 10px 15px; font-weight: 800; font-size: 0.8rem; border-radius: 20px;">
-      الشمال 🔵
-    </button>
-    <button id="s2-secret-btn" type="button" style="position: absolute; left: 120px; top: 62px; width: 35px; height: 35px; background: #FFC83D; border: none; border-radius: 50%; opacity: 0.4; font-size: 12px;">🔑</button>
-  </div>
-
-  <!-- STAGE 3 CONTAINER (Mobile Reverse Mirror) -->
-  <div id="stage-3-box" style="display: none; position: relative; width: 280px; height: 160px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden; margin: 0 auto;">
-    <button id="s3-mirror-btn" type="button" style="position: absolute; left: 80px; top: 60px; background: #22C55E; color: white; border: none; padding: 10px 18px; font-weight: 800; font-size: 0.85rem; border-radius: 30px;">
-      🪞 زرار العكس
-    </button>
-  </div>
-
-  <!-- STAGE 4 CONTAINER (Fake Victory) -->
-  <div id="stage-4-box" style="display: none; flex-direction: column; align-items: center; gap: 12px;">
-    <div style="font-size: 35px;">🎉🥳</div>
-    <p style="color: #22C55E; font-weight: 800; font-size: 1rem; margin: 0;">عاش! خلصت كل ألغاز الموبايل!</p>
-    <button id="final-troll-btn" type="button" style="background: linear-gradient(135deg, #FFC83D, #FF4D4D); color: #0A1F4A; border: none; padding: 12px 24px; font-weight: 900; font-size: 1rem; border-radius: 30px; box-shadow: 0 4px 20px rgba(255,200,61,0.5);">
-      Enter Site Now 🔓
-    </button>
-  </div>
-
-  <!-- Feedback Message -->
-  <p id="maze-msg" style="margin-top: 15px; font-size: 0.85rem; color: #FFC83D; font-weight: 700; height: 22px;"></p>
 
   <script>
     (function() {
-      const icon = document.getElementById('maze-icon');
-      const title = document.getElementById('maze-title');
-      const desc = document.getElementById('maze-desc');
-      const msg = document.getElementById('maze-msg');
-
-      const s1Box = document.getElementById('stage-1-box');
-      const s1Btn = document.getElementById('s1-btn');
-
-      const s2Box = document.getElementById('stage-2-box');
-      const s2Left = document.getElementById('s2-btn-left');
-      const s2Right = document.getElementById('s2-btn-right');
-      const s2Secret = document.getElementById('s2-secret-btn');
-
-      const s3Box = document.getElementById('stage-3-box');
-      const s3Mirror = document.getElementById('s3-mirror-btn');
-
-      const s4Box = document.getElementById('stage-4-box');
-      const finalBtn = document.getElementById('final-troll-btn');
-
-      // STAGE 1 MOBILE LOGIC
-      let s1Count = 0;
-      let isS1Still = false;
-
-      function dodgeS1(e) {
-        if (isS1Still) return;
-        if(e) e.preventDefault();
-        s1Count++;
-        const maxX = s1Box.offsetWidth - s1Btn.offsetWidth;
-        const maxY = s1Box.offsetHeight - s1Btn.offsetHeight;
-        s1Btn.style.left = Math.floor(Math.random() * maxX) + 'px';
-        s1Btn.style.top = Math.floor(Math.random() * maxY) + 'px';
-
-        if (s1Count >= 4) {
-          msg.textContent = "صعبت عليا.. ثبت لـ 3 ثواني، اضغط بسرعة!";
-          isS1Still = true;
-          s1Btn.style.background = "#22C55E";
-          s1Btn.textContent = "دوس هنا بسرعة! 🎯";
-          setTimeout(() => {
-            if (s1Box.style.display !== 'none') {
-              isS1Still = false;
-              s1Btn.style.background = "#FFC83D";
-              s1Btn.textContent = "فاتك الوقت! 😜";
-              msg.textContent = "هرب تاني!";
-            }
-          }, 3000);
+      const btn = document.getElementById('maintenance-status-btn');
+      const msg = document.getElementById('maintenance-msg');
+      
+      let clicks = 0;
+      btn.addEventListener('click', () => {
+        clicks++;
+        if (clicks === 1) {
+          msg.textContent = "Server load is optimal. Compiling assets...";
+        } else if (clicks === 2) {
+          msg.textContent = "Almost done building the new experience.";
         } else {
-          msg.textContent = "صوابعك سريعة بس مش أسرع مني! 😂";
+          msg.textContent = "Sit tight, big things are coming! 🚀";
+          clicks = 0;
         }
-      }
-
-      s1Btn.addEventListener('touchstart', dodgeS1);
-      s1Btn.addEventListener('mouseover', dodgeS1);
-      s1Btn.addEventListener('click', () => {
-        if (isS1Still || s1Count >= 4) {
-          s1Box.style.display = 'none';
-          s2Box.style.display = 'block';
-          title.textContent = "STAGE 2: MOBILE TRAP";
-          desc.textContent = "الزرار اتقسم اثنين.. دور على مفتاح السر في النص!";
-          icon.textContent = "📱⚔️";
-          msg.textContent = "اضغط على النقطة الصفراء اللي في النص!";
-        }
-      });
-
-      // STAGE 2 MOBILE LOGIC
-      function dodgeS2(e) {
-        if(e) e.preventDefault();
-        const rect = s2Box.getBoundingClientRect();
-        const touchX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-
-        if (touchX < 140) {
-          s2Left.style.left = '5px';
-          s2Right.style.right = '5px';
-        } else {
-          s2Left.style.left = '130px';
-          s2Right.style.right = '130px';
-        }
-        msg.textContent = "بيجروا من صباعك! ركز في النص! 👀";
-      }
-
-      s2Box.addEventListener('touchmove', dodgeS2);
-      s2Box.addEventListener('mousemove', dodgeS2);
-
-      s2Secret.addEventListener('click', () => {
-        s2Box.style.display = 'none';
-        s3Box.style.display = 'block';
-        title.textContent = "STAGE 3: REVERSE TOUCH";
-        desc.textContent = "الزرار بيتحرك عكس اتجاه لمس صباعك تماماً!";
-        icon.textContent = "🪞";
-        msg.textContent = "المس عكس المكان اللي عايز تروحه!";
-      });
-
-      // STAGE 3 MOBILE LOGIC
-      s3Box.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const rect = s3Box.getBoundingClientRect();
-        const tX = e.touches[0].clientX - rect.left;
-        const tY = e.touches[0].clientY - rect.top;
-
-        const invX = Math.max(5, Math.min(180, 280 - tX - 70));
-        const invY = Math.max(5, Math.min(110, 160 - tY - 30));
-
-        s3Mirror.style.left = invX + 'px';
-        s3Mirror.style.top = invY + 'px';
-      });
-
-      s3Mirror.addEventListener('click', () => {
-        s3Box.style.display = 'none';
-        s4Box.style.display = 'flex';
-        title.textContent = "FINAL STAGE: VICTORY?";
-        desc.textContent = "خلصت كل تحديات الموبايل بنجاح!";
-        icon.textContent = "👑";
-        msg.textContent = "";
-      });
-
-      // STAGE 4 FINAL TROLL
-      finalBtn.addEventListener('click', () => {
-        alert("عاش يا وحش! حليت كل ألغاز الموبايل! 📱👏\n\nبس برضه الموقع مقفل وإياد بيمسيك التحية، استنى لما يخلص بقى! ☕😂");
       });
     })();
   </script>
 </div>
-  
 <!-- ============ FRONT DOOR ============ -->
 <section class="screen on" id="splash" aria-label="Welcome">
   <div class="splash calm">
