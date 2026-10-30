@@ -524,7 +524,6 @@ function initTrips() {
       const card = el('div', { class: 'trip-card' },
         el('div', { style: 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;' },
           el('span', { style: 'font-size: 0.75rem; color: var(--yellow); font-weight: 800; letter-spacing: 1px;', text: '📅 ' + (t.date || '') }),
-          el('span', { style: 'background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; color: var(--blue); font-weight: 700;', text: '📂 صفحة اليوم' })
         ),
         el('div', { style: 'width: 100%; height: 180px; border-radius: 14px; overflow: hidden; background: #0A1F4A; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.12);' },
           el('img', { src: coverImg, style: 'width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;' })
