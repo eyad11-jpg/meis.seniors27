@@ -470,7 +470,9 @@ function initPeople() {
     });
 }
   
-/* ============ TRIPS (Classic Cards + Wall of Fame Modal) ============ */
+/* ==========================================================
+   TRIPS: Classic Cards + Detective Wall of Fame (Final)
+========================================================== */
 let tripsBuilt = false;
 function initTrips() {
   if (tripsBuilt) return; tripsBuilt = true;
@@ -486,16 +488,23 @@ function initTrips() {
 
     (base ? probe(base, 20) : Promise.resolve([])).then(found => {
       const srcs = [...new Set([...explicit, ...found])];
+      const coverImg = srcs.length > 0 ? srcs[0] : 'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=600&auto=format&fit=crop';
       
-      // الكارت الكلاسيكي لصفحة الرحلات الأساسية (زي ما هو بدون تغيير)
+      // بناء الكارت بنفس التصميم الراقي الأصلي (صورة بارزة فوق وتاريخ واسم الرحلة)
       const ticket = el('div', { class: 'ticket tilt', style: 'cursor: pointer;' },
+        el('div', { style: 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;' },
+          el('span', { style: 'font-size: 0.85rem; color: #FFC83D; font-weight: 800;', text: '📅 ' + (t.date || '') }),
+          el('span', { style: 'background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; color: #fff; font-weight: 700;', text: '📁 صفحة اليوم' })
+        ),
+        el('div', { style: 'width: 100%; aspect-ratio: 16/10; border-radius: 14px; overflow: hidden; background: #0A1F4A; margin-bottom: 14px; border: 2px solid rgba(255,255,255,0.15);' },
+          el('img', { src: coverImg, alt: t.name, style: 'width: 100%; height: 100%; object-fit: cover;', loading: 'lazy' })
+        ),
         el('h3', { text: t.name }),
-        t.date ? el('span', { class: 'stamp', text: t.date }) : null,
-        t.note ? el('p', { text: t.note }) : null,
-        el('p', { class: 'hand', style: 'margin-top: 10px; color: #e0457b; font-size: 22px;', text: '✨ Tap to view Wall of Fame (' + srcs.length + ' photos)' })
+        t.note ? el('p', { text: t.note, style: 'margin-bottom: 8px;' }) : null,
+        el('p', { class: 'hand', style: 'color: #ffc83d; font-size: 18px; margin-top: 6px;', text: '🔍 Tap to open Detective Wall (' + srcs.length + ' photos)' })
       );
 
-      // عند الضغط على الكارت -> يفتح الـ Wall of Fame في الشاشة
+      // عند الضغط على الكارت -> يفتح لوحة التحقيقات (Detective Wall)
       ticket.onclick = () => {
         pop();
         openWallOfFame(t.name, srcs);
@@ -511,37 +520,53 @@ function initTrips() {
   });
 }
 
-/* ---------- WALL OF FAME MODAL LOGIC ---------- */
+/* ============ DETECTIVE WALL OF FAME MODAL LOGIC ============ */
 function openWallOfFame(title, photos) {
   let modal = $('#wall-modal');
   if (!modal) {
     modal = el('div', { id: 'wall-modal', class: 'wall-overlay' },
       el('button', { class: 'wall-close', type: 'button', onclick: closeWallOfFame }, '✕'),
-      el('div', { class: 'wall-content' },
-        el('h2', { id: 'wall-title', class: 'wall-heading' }),
-        el('div', { id: 'wall-grid', class: 'wall-grid-container' })
+      el('div', { class: 'detective-board' },
+        el('div', { class: 'board-header' },
+          el('span', { class: 'classified-stamp', text: 'TOP SECRET // CLASSIFIED' }),
+          el('h2', { id: 'wall-title', class: 'wall-heading' })
+        ),
+        el('div', { id: 'wall-grid', class: 'detective-grid' })
+      ),
+      // نافذة تكبير الصورة عند الضغط عليها داخل اللوحة
+      el('div', { id: 'wall-zoom-view', class: 'wall-zoom-overlay', onclick: (e) => { if(e.target.id === 'wall-zoom-view') closeZoomView(); } },
+        el('button', { class: 'wall-close zoom-close', type: 'button', onclick: closeZoomView }, '✕'),
+        el('img', { id: 'wall-zoom-img', src: '', alt: '' })
       )
     );
     document.body.append(modal);
   }
 
-  $('#wall-title').textContent = title + ' 🏆 Wall of Fame';
+  $('#wall-title').textContent = title + ' — CASE FILES 📂';
   const grid = $('#wall-grid');
   grid.replaceChildren();
 
   if (photos.length === 0) {
-    grid.append(el('p', { class: 'hand', style: 'color: #fff; font-size: 24px; grid-column: 1/-1;', text: '📷 No photos added yet!' }));
+    grid.append(el('p', { class: 'hand', style: 'color: #f59e0b; font-size: 24px; grid-column: 1/-1;', text: '🔍 No evidence collected for this case yet!' }));
   } else {
     photos.forEach((src, idx) => {
-      const item = el('div', { class: 'wall-card tilt' },
-        el('img', { src: src, alt: title + ' ' + (idx + 1), loading: 'lazy' })
+      // زاوية ميلان عشوائية لكل صورة كأنها مثبته بدبوس حقيقي
+      const randomRotate = (Math.random() * 8 - 4).toFixed(1);
+      
+      const photoFrame = el('div', { class: 'polaroid-card', style: `--rot: ${randomRotate}deg;` },
+        el('div', { class: 'push-pin' }), // دبوس الضغط فوق الصورة
+        el('div', { class: 'photo-inner' },
+          el('img', { src: src, alt: title + ' ' + (idx + 1), loading: 'lazy' })
+        ),
+        el('div', { class: 'photo-label', text: `EVIDENCE #${idx + 1}` })
       );
-      // ضغط الصورة جوه الـ Wall يفتح المكبر العادي
-      item.onclick = () => {
+
+      photoFrame.onclick = () => {
         pop();
-        openLB(photos.map(s => ({ src: s, cap: title })), idx);
+        openZoomView(src);
       };
-      grid.append(item);
+      
+      grid.append(photoFrame);
     });
   }
 
@@ -551,7 +576,23 @@ function openWallOfFame(title, photos) {
 function closeWallOfFame() {
   const modal = $('#wall-modal');
   if (modal) modal.classList.remove('active');
+  closeZoomView();
 }
+
+function openZoomView(src) {
+  const zoomView = $('#wall-zoom-view');
+  const zoomImg = $('#wall-zoom-img');
+  if (zoomView && zoomImg) {
+    zoomImg.src = src;
+    zoomView.classList.add('active');
+  }
+}
+
+function closeZoomView() {
+  const zoomView = $('#wall-zoom-view');
+  if (zoomView) zoomView.classList.remove('active');
+}
+
 
 /* ============ SECRET MAIL ============ */
 const api = () => (S.mailApi || '').trim();
