@@ -470,49 +470,43 @@ function initPeople() {
     });
 }
   
-/* ============ TRIPS ============ */
+/* ============ TRIPS (3D Zig-Zag Timeline & Gallery) ============ */
 let tripsBuilt = false;
 function initTrips() {
   if (tripsBuilt) return; tripsBuilt = true;
   const box = $('#tripl'), trips = S.trips || [];
   if (!trips.length) { box.append(el('p', { class: 'hand', text: 'No trips yet. We were busy being legends at home.' })); return; }
+  
+  box.className = 'route';
+  box.replaceChildren();
+
   trips.forEach((t, i) => {
-    const strip = el('div', { class: 'strip', style: 'display: flex; flex-wrap: wrap; gap: 12px; width: 100%; height: auto;' });
-    [0, 1].forEach(k => strip.append(polaroid(null, '', i * 2 + k)));
-    
-    // Updated card styles so height and width expand to fit photo dimensions
-    const ticket = el('div', { class: 'ticket', style: 'height: auto; min-height: fit-content; max-width: 100%; display: inline-block;' },
-      el('h3', { text: t.name }),
-      t.date ? el('span', { class: 'stamp', text: t.date }) : null,
-      t.note ? el('p', { text: t.note }) : null,
-      strip
-    );
-
-    const stop = el('div', { class: 'stop', style: 'height: auto; align-items: flex-start;' },
-      el('span', { class: 'pinm', 'aria-hidden': 'true', text: i === 0 ? '✈️' : '📍' }),
-      ticket
-    );
-
-    box.append(stop);
     const base = t.folder ? 'trips/' + t.folder : null;
-    const explicit = (t.photos || []).map(f => path(f, base || 'trips'));
+    
     (base ? probe(base, 12) : Promise.resolve([])).then(found => {
-      const srcs = [...new Set([...explicit, ...found])];
-      if (!srcs.length) return;
-      const items = srcs.map((src, k) => ({ src, cap: t.name }));
-      strip.replaceChildren(...items.map((it, k) => {
-        const pol = polaroid(it.src, '', k);
-        // Ensure photo maintains auto height and scaled width inside button wrapper
-        const img = pol.querySelector('img');
-        if (img) {
-          img.style.width = '100%';
-          img.style.height = 'auto';
-          img.style.objectFit = 'contain';
-        }
-        const b = el('button', { type: 'button', style: 'height: auto; width: fit-content; border: none; background: none; padding: 0;', 'aria-label': 'Open photo from ' + t.name }, pol);
-        b.onclick = () => { pop(); openLB(items, k); };
-        return b;
-      }));
+      const coverImg = found.length > 0 ? found[0] : 'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=600&auto=format&fit=crop';
+      
+      const ticket = el('div', { class: 'ticket tilt', style: 'cursor: pointer; position: relative;' },
+        el('div', { style: 'font-size: 0.75rem; color: #60A5FA; font-weight: 700; margin-bottom: 6px;', text: '📅 ' + (t.date || '') }),
+        el('div', { style: 'width: 100%; height: 150px; border-radius: 12px; overflow: hidden; background: #1E293B; margin-bottom: 10px;' },
+          el('img', { src: coverImg, style: 'width: 100%; height: 100%; object-fit: cover;' })
+        ),
+        el('h3', { text: t.name }),
+        t.note ? el('p', { text: t.note, style: 'font-size: 0.9rem; color: #94A3B8; margin-top: 6px;' }) : null
+      );
+
+      ticket.onclick = () => {
+        pop();
+        const galleryItems = (found.length > 0 ? found : [coverImg]).map(src => ({ src, cap: t.name }));
+        openLB(galleryItems, 0);
+      };
+
+      const stop = el('div', { class: 'stop', style: `display: flex; justify-content: ${i % 2 === 0 ? 'flex-start' : 'flex-end'}; position: relative; margin-bottom: 40px;` },
+        el('span', { class: 'pinm', 'aria-hidden': 'true', text: i === 0 ? '🐪' : '🔥' }),
+        el('div', { style: 'width: 85%;' }, ticket)
+      );
+
+      box.append(stop);
     });
   });
 }
