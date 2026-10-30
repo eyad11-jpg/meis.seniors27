@@ -470,7 +470,7 @@ function initPeople() {
     });
 }
   
-/* ============ TRIPS (3D Zig-Zag Timeline & Gallery) ============ */
+/* ============ TRIPS (Cinematic 3D Zig-Zag Book Pages & Gallery) ============ */
 let tripsBuilt = false;
 function initTrips() {
   if (tripsBuilt) return; tripsBuilt = true;
@@ -480,30 +480,69 @@ function initTrips() {
   box.className = 'route';
   box.replaceChildren();
 
+  // تنسيق الـ CSS المخصص عشان الخط في المنتصف والكروت يمين وشمال بشكل تفاعلي فخم
+  if (!document.getElementById('trip-pages-style')) {
+    const style = el('style', { id: 'trip-pages-style' }, `
+      .route { position: relative; padding: 30px 0; max-width: 900px; margin: 0 auto; }
+      /* الخط المنور في المنتصف تماماً */
+      .route::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--yellow), var(--blue), var(--pink)); transform: translateX(-50%); border-radius: 4px; box-shadow: 0 0 20px rgba(169,214,247,0.5); }
+      
+      .trip-stop { display: flex; width: 100%; position: relative; margin-bottom: 60px; align-items: center; }
+      /* توزيع الكروت: الأول يمين والثاني شمال بالتناوب */
+      .trip-stop.left { justify-content: flex-start; }
+      .trip-stop.right { justify-content: flex-end; }
+      
+      .trip-stop.left .trip-card { margin-right: 52%; }
+      .trip-stop.right .trip-card { margin-left: 52%; }
+
+      /* شكل كارت الصفحة الأسطوري 3D */
+      .trip-card { width: 48%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(14px); border: 2px solid rgba(255,255,255,0.18); border-radius: 22px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25); transition: transform 0.35s cubic-bezier(.3,1.5,.5,1), box-shadow 0.35s, border-color 0.35s; cursor: pointer; position: relative; transform-style: preserve-3d; }
+      .trip-card:hover { transform: translateY(-8px) scale(1.03) perspective(1000px) rotateX(3deg); box-shadow: 0 35px 70px rgba(0,0,0,0.8), 0 0 25px rgba(255,200,61,0.4); border-color: var(--yellow); }
+      
+      /* الدبوس المستقر في نص الخط الفاصل */
+      .trip-pin { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; border-radius: 50%; background: var(--yellow); border: 4px solid var(--navy); display: grid; place-items: center; font-size: 17px; box-shadow: 0 0 18px var(--yellow); z-index: 10; }
+
+      /* تعديل شاشات الموبايل لتجنب التكسير والحفاظ على الانسيابية */
+      @media(max-width: 768px) {
+        .route::before { left: 30px; }
+        .trip-stop.left, .trip-stop.right { justify-content: flex-end; }
+        .trip-stop.left .trip-card, .trip-stop.right .trip-card { margin-left: 70px; margin-right: 0; width: calc(100% - 70px); }
+        .trip-pin { left: 30px; margin-left: -20px; }
+      }
+    `);
+    document.head.append(style);
+  }
+
   trips.forEach((t, i) => {
     const base = t.folder ? 'trips/' + t.folder : null;
+    const isLeft = i % 2 === 0; // الزوجي يمين، الفردي شمال
     
     (base ? probe(base, 12) : Promise.resolve([])).then(found => {
       const coverImg = found.length > 0 ? found[0] : 'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=600&auto=format&fit=crop';
       
-      const ticket = el('div', { class: 'ticket tilt', style: 'cursor: pointer; position: relative;' },
-        el('div', { style: 'font-size: 0.75rem; color: #60A5FA; font-weight: 700; margin-bottom: 6px;', text: '📅 ' + (t.date || '') }),
-        el('div', { style: 'width: 100%; height: 150px; border-radius: 12px; overflow: hidden; background: #1E293B; margin-bottom: 10px;' },
-          el('img', { src: coverImg, style: 'width: 100%; height: 100%; object-fit: cover;' })
+      // بناء كارت الصفحة
+      const card = el('div', { class: 'trip-card' },
+        el('div', { style: 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;' },
+          el('span', { style: 'font-size: 0.75rem; color: var(--yellow); font-weight: 800; letter-spacing: 1px;', text: '📅 ' + (t.date || '') }),
+          el('span', { style: 'background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; color: var(--blue); font-weight: 700;', text: '📂 صفحة اليوم' })
         ),
-        el('h3', { text: t.name }),
-        t.note ? el('p', { text: t.note, style: 'font-size: 0.9rem; color: #94A3B8; margin-top: 6px;' }) : null
+        el('div', { style: 'width: 100%; height: 180px; border-radius: 14px; overflow: hidden; background: #0A1F4A; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.12);' },
+          el('img', { src: coverImg, style: 'width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;' })
+        ),
+        el('h3', { style: 'font-family: var(--fh); font-weight: 900; font-size: 1.5rem; margin: 0; color: #fff;', text: t.name }),
+        t.note ? el('p', { style: 'font-family: var(--fc); font-size: 1.25rem; color: #94A3B8; margin: 6px 0 0 0; line-height: 1.2;', text: t.note }) : null
       );
 
-      ticket.onclick = () => {
+      // تفاعل الضغط: الدخول إلى بروفايل اليوم وعرض ألبوم الصور بالكامل في المعرض التفاعلي
+      card.onclick = () => {
         pop();
-        const galleryItems = (found.length > 0 ? found : [coverImg]).map(src => ({ src, cap: t.name }));
+        const galleryItems = (found.length > 0 ? found : [coverImg]).map(src => ({ src, cap: t.name + ' — ' + (t.date || '') }));
         openLB(galleryItems, 0);
       };
 
-      const stop = el('div', { class: 'stop', style: `display: flex; justify-content: ${i % 2 === 0 ? 'flex-start' : 'flex-end'}; position: relative; margin-bottom: 40px;` },
-        el('span', { class: 'pinm', 'aria-hidden': 'true', text: i === 0 ? '🐪' : '🔥' }),
-        el('div', { style: 'width: 85%;' }, ticket)
+      const stop = el('div', { class: `trip-stop ${isLeft ? 'left' : 'right'}` },
+        el('div', { class: 'trip-pin', text: isLeft ? '🐪' : '🔥' }),
+        card
       );
 
       box.append(stop);
