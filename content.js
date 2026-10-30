@@ -72,11 +72,11 @@ window.SITE = {
   /* ---------- TRIPS ----------
      "folder" = a folder name inside "trips". Put the trip photos in it, named 1.jpg, 2.jpg ...
      (Example: trips/first-trip/1.jpg)  */
-  trips: [
-    { name: "Our First Trip (rename me)", date: "Month 2026", note: "Where we went, and how we got lost.", folder: "first-trip" },
-    { name: "The Big Trip (rename me)",   date: "Month 2027", note: "Nobody remembers the plan. Everybody remembers the snacks.", folder: "big-trip" }
+ trips: [
+    { name: "رحلة الأهرامات الأسطورية 🐪", date: "15 أكتوبر 2026", note: "اليوم اللي ضيعنا فيه الاتجاهات بس ضحكنا للصبح.", folder: "first-trip" },
+    { name: "حفلة تيشيرتات السينيورز 🔥", date: "20 نوفمبر 2026", note: "أجواء العظمة وتصاميم الدفعة الأسطورية.", folder: "big-trip" },
+    { name: "رحلة دهب والدلع 🌊", date: "10 يناير 2027", note: "أحلى أيام البحر والاستجمام مع إخواتي.", folder: "dahab-trip" }
   ],
-
   /* ---------- SECRET MAIL ----------
      Paste the long link you get from Google Apps Script here (README step 9). */
   mailApi: "https://script.google.com/macros/s/AKfycbxmGtDqpL7kUXdYuvB3NC3N8Z4M6Bxl7gVOzFaUa7mdeXR8tQIVMcs3gbtedzC53VA_/exec"
