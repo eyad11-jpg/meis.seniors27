@@ -192,20 +192,21 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
 .ph.init small{font-family:var(--fc);font-weight:700;font-size:20px}
 .none{text-align:center;margin-top:30px}
 
-/* ---------- trips (Alternating Right & Left) ---------- */
+/* ---------- trips (Perfect Alternating Right & Left) ---------- */
 .route {
   position: relative;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px 10px;
 }
 
+/* الخط النقطي في المنتصف تماماً */
 .route::before {
   content: "";
   position: absolute;
   left: 50%;
-  top: 8px;
-  bottom: 8px;
+  top: 10px;
+  bottom: 10px;
   border-left: 5px dotted var(--blue);
   opacity: .8;
   transform: translateX(-50%);
@@ -213,36 +214,37 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
 
 .stop {
   position: relative;
-  margin-bottom: 46px;
+  margin-bottom: 50px;
   display: flex;
   width: 100%;
+  align-items: center;
 }
 
-/* الكارت الفردي (يمين) والزوجي (شمال) لعمل شكل التبادل */
+/* الكارت الفردي يمين والزوجي شمال مع إعطاء مساحة للخط في المنتصف */
 .stop:nth-child(odd) {
-  justify-content: flex-start;
-  padding-right: 15%;
+  justify-content: flex-end;
+  padding-right: 52%;
 }
 
 .stop:nth-child(even) {
-  justify-content: flex-end;
-  padding-left: 15%;
+  justify-content: flex-start;
+  padding-left: 52%;
 }
 
-/* شكل الأيقونة أو الدبوس في المنتصف على الخط الزمني */
+/* دبوس الدائرة الصفراء يثبت في المنتصف على الخط بالضبط */
 .pinm {
   position: absolute;
   left: 50%;
-  top: 6px;
-  width: 32px;
-  height: 32px;
-  margin-left: -16px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--yellow);
   border: 3px solid #fff;
   display: grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 16px;
   box-shadow: 2px 3px 0 var(--hard);
   z-index: 10;
 }
@@ -252,16 +254,16 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
   background: #fff;
   color: var(--navy);
   border-radius: 18px;
-  padding: 18px 16px 6px;
+  padding: 18px 16px 12px;
   box-shadow: 7px 8px 0 var(--hard);
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
 }
 
 .ticket h3 {
   font-family: var(--fh);
   font-weight: 900;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1;
   margin: 0 0 8px;
 }
@@ -269,15 +271,16 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
 .ticket p {
   font-family: var(--fc);
   font-weight: 700;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: #3b5c93;
 }
 
+/* للشاشات الموبايل الصغيرة تظهر تحت بعضها بشكل طبيعي */
 @media (max-width: 768px) {
   .route {
-    padding-left: 46px;
+    padding-left: 40px;
   }
   .route::before {
     left: 15px;
@@ -286,11 +289,12 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
   .stop:nth-child(odd),
   .stop:nth-child(even) {
     justify-content: flex-start;
-    padding: 0;
+    padding: 0 0 0 20px;
   }
   .pinm {
-    left: -46px;
-    margin-left: 0;
+    left: 15px;
+    top: 24px;
+    transform: none;
   }
 }
 
