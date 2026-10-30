@@ -346,17 +346,17 @@ box-shadow:0 1px 0 var(--edge),0 2px 0 var(--edge),0 3px 0 var(--edge),0 4px 0 v
 /* ---------- Split Doors page transition ---------- */
 .cutslit{position:absolute;inset:0;background:var(--yellow);will-change:transform,opacity}
 .cutseam{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:#fff;box-shadow:0 0 0 3px var(--yellow),0 0 28px 6px rgba(255,200,61,.85);transform-origin:50% 0;will-change:transform}
-/* ================= WALL OF FAME OVERLAY ================= */
+/* ================= DETECTIVE WALL STYLING ================= */
 .wall-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(4, 16, 48, 0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 10, 12, 0.92);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: max(20px, env(safe-area-inset-top)) 16px 30px;
+  padding: max(20px, env(safe-area-inset-top)) 16px 40px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -368,71 +368,149 @@ box-shadow:0 1px 0 var(--edge),0 2px 0 var(--edge),0 3px 0 var(--edge),0 4px 0 v
   pointer-events: auto;
 }
 
-.wall-content {
+/* لوحة الفلين / التحقيقات */
+.detective-board {
   width: 100%;
-  max-width: 900px;
-  margin-top: 40px;
+  max-width: 1000px;
+  margin-top: 30px;
+  background: #2a1a08 url('https://www.transparenttextures.com/patterns/cork-board.png');
+  border: 12px solid #1a0f05;
+  border-radius: 12px;
+  padding: 30px 20px;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.9);
+  position: relative;
+}
+
+.board-header {
   text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.classified-stamp {
+  display: inline-block;
+  border: 3px solid #dc2626;
+  color: #dc2626;
+  font-weight: 900;
+  font-family: monospace;
+  font-size: 14px;
+  padding: 4px 12px;
+  letter-spacing: 3px;
+  transform: rotate(-3deg);
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .wall-heading {
   font-family: var(--fh);
   font-weight: 900;
-  font-size: clamp(28px, 6vw, 48px);
-  color: var(--yellow);
-  margin-bottom: 24px;
-  text-shadow: 2px 2px 0 var(--hard);
+  font-size: clamp(24px, 5vw, 42px);
+  color: #fef08a;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 }
 
-.wall-close {
-  position: fixed;
-  top: max(16px, env(safe-area-inset-top));
-  right: 16px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--pink);
-  color: var(--navy);
-  font-weight: 800;
-  font-size: 22px;
-  border: 3px solid #fff;
-  cursor: pointer;
-  box-shadow: 3px 4px 0 var(--hard);
-  z-index: 10000;
-}
-
-/* الشبكة المربعة والتعليق على الحيطة */
-.wall-grid-container {
+/* شبكة الصور (البولاروايد) */
+.detective-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 22px;
   padding: 10px;
 }
 
-.wall-card {
-  aspect-ratio: 1 / 1;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #fff;
-  padding: 6px;
-  box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.4);
+/* كارت البولاروايد المائل */
+.polaroid-card {
+  position: relative;
+  background: #fcfbf9;
+  padding: 8px 8px 24px 8px;
+  border-radius: 2px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 2px 5px rgba(0, 0, 0, 0.3);
+  transform: rotate(var(--rot, 0deg));
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border: 2px solid #fff;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.2s;
 }
 
-.wall-card img {
+.polaroid-card:hover {
+  transform: scale(1.15) rotate(0deg) !important;
+  z-index: 20;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.6);
+}
+
+.photo-inner {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid #ddd;
+}
+
+.photo-inner img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
   display: block;
 }
 
-@media (hover: hover) {
-  .wall-card:hover {
-    transform: scale(1.1) rotate(2deg);
-    z-index: 5;
-    box-shadow: 6px 10px 0 rgba(0, 0, 0, 0.5);
-  }
+.photo-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 11px;
+  color: #444;
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+/* دبوس الضغط أحمر اللون فوق كل صورة */
+.push-pin {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000);
+  border-radius: 50%;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+
+.push-pin::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+
+/* مكبر الصور الداخلي */
+.wall-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 10001;
+}
+
+.wall-zoom-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wall-zoom-overlay img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border: 8px solid #fcfbf9;
+  border-radius: 4px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
 }
