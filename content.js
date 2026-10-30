@@ -72,7 +72,7 @@ window.SITE = {
   /* ---------- TRIPS ----------
      "folder" = a folder name inside "trips". Put the trip photos in it, named 1.jpg, 2.jpg ...
      (Example: trips/first-trip/1.jpg)  */
- MEMORIES LANE : [
+  trips: [
   { name: "Our First Trip (rename me)", date: "Month 2026", note: "Where we went, and how we got lost.", folder: "first-trip" },
     { name: "The Big Trip (rename me)",   date: "Month 2027", note: "Nobody remembers the plan. Everybody remembers the snacks.", folder: "big-trip" }
   ],
