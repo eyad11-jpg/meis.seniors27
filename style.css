@@ -192,24 +192,108 @@ input,select,textarea{width:100%;font:inherit;font-weight:700;padding:12px 14px;
 .ph.init small{font-family:var(--fc);font-weight:700;font-size:20px}
 .none{text-align:center;margin-top:30px}
 
-/* ---------- trips ---------- */
-.route{position:relative;padding-left:46px}
-.route::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;border-left:5px dotted var(--blue);opacity:.8}
-.stop{position:relative;margin-bottom:46px}
-.pinm{position:absolute;left:-46px;top:6px;width:32px;height:32px;border-radius:50%;background:var(--yellow);border:3px solid #fff;display:grid;place-items:center;font-size:15px;box-shadow:2px 3px 0 var(--hard)}
-.ticket{position:relative;background:#fff;color:var(--navy);border-radius:18px;padding:18px 16px 6px;box-shadow:7px 8px 0 var(--hard);rotate:var(--r,0deg)}
-.stop:nth-child(odd) .ticket{--r:-1.2deg}.stop:nth-child(even) .ticket{--r:1.2deg}
-.ticket::before,.ticket::after{content:"";position:absolute;top:58px;width:22px;height:22px;border-radius:50%;background:var(--navy)}
-.ticket::before{left:-12px}.ticket::after{right:-12px}
-.ticket h3{font-family:var(--fh);font-weight:900;font-size:28px;line-height:1;margin:0 0 8px}
-.stamp{font-family:var(--fc);font-weight:700;font-size:24px;color:#e0457b;border:3px double #e0457b;padding:0 10px;rotate:-4deg;display:inline-block}
-.ticket p{font-family:var(--fc);font-weight:700;font-size:24px;line-height:1;margin:10px 0 0;color:#3b5c93}
-.strip{display:flex;gap:14px;overflow-x:auto;padding:22px 4px 22px;margin-top:6px;border-top:3px dashed #c4d8ee;scroll-snap-type:x mandatory}
-.strip .polaroid{flex:0 0 140px;scroll-snap-align:start;box-shadow:4px 5px 0 rgba(0,0,0,.25);padding:8px 8px 8px}
-.strip .polaroid:nth-child(odd){rotate:-3deg}.strip .polaroid:nth-child(even){rotate:3deg}
-.strip .ph{aspect-ratio:1}
-.strip .ph.empty b{font-size:19px}
-.strip button{display:block;flex:0 0 auto}
+/* ---------- trips (Alternating Right & Left) ---------- */
+.route {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+
+.route::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: 8px;
+  border-left: 5px dotted var(--blue);
+  opacity: .8;
+  transform: translateX(-50%);
+}
+
+.stop {
+  position: relative;
+  margin-bottom: 46px;
+  display: flex;
+  width: 100%;
+}
+
+/* الكارت الفردي (يمين) والزوجي (شمال) لعمل شكل التبادل */
+.stop:nth-child(odd) {
+  justify-content: flex-start;
+  padding-right: 15%;
+}
+
+.stop:nth-child(even) {
+  justify-content: flex-end;
+  padding-left: 15%;
+}
+
+/* شكل الأيقونة أو الدبوس في المنتصف على الخط الزمني */
+.pinm {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  border-radius: 50%;
+  background: var(--yellow);
+  border: 3px solid #fff;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  box-shadow: 2px 3px 0 var(--hard);
+  z-index: 10;
+}
+
+.ticket {
+  position: relative;
+  background: #fff;
+  color: var(--navy);
+  border-radius: 18px;
+  padding: 18px 16px 6px;
+  box-shadow: 7px 8px 0 var(--hard);
+  width: 100%;
+  max-width: 420px;
+}
+
+.ticket h3 {
+  font-family: var(--fh);
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
+.ticket p {
+  font-family: var(--fc);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  margin: 10px 0 0;
+  color: #3b5c93;
+}
+
+@media (max-width: 768px) {
+  .route {
+    padding-left: 46px;
+  }
+  .route::before {
+    left: 15px;
+    transform: none;
+  }
+  .stop:nth-child(odd),
+  .stop:nth-child(even) {
+    justify-content: flex-start;
+    padding: 0;
+  }
+  .pinm {
+    left: -46px;
+    margin-left: 0;
+  }
+}
+
 
 /* ---------- mail ---------- */
 .tabs{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
