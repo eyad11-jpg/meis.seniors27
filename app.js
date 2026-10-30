@@ -470,80 +470,89 @@ function initPeople() {
     });
 }
   
-/* ============ TRIPS (Mobile-Optimized Compact 3D & Wall of Fame) ============ */
+/* ============ TRIPS (Classic Cards + Wall of Fame Modal) ============ */
 let tripsBuilt = false;
 function initTrips() {
   if (tripsBuilt) return; tripsBuilt = true;
   const box = $('#tripl'), trips = S.trips || [];
-  if (!trips.length) { box.append(el('p', { class: 'hand', text: 'No trips yet.' })); return; }
-  
+  if (!trips.length) { box.append(el('p', { class: 'hand', text: 'No trips yet. We were busy being legends at home.' })); return; }
+
   box.className = 'route';
   box.replaceChildren();
 
-  if (!document.getElementById('trip-pages-style')) {
-    const style = el('style', { id: 'trip-pages-style' }, `
-      .route { position: relative; padding: 20px 0; max-width: 800px; margin: 0 auto; }
-      .route::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--yellow), var(--blue), var(--pink)); transform: translateX(-50%); border-radius: 4px; box-shadow: 0 0 15px rgba(169,214,247,0.4); }
-      
-      .trip-stop { display: flex; width: 100%; position: relative; margin-bottom: 40px; align-items: center; }
-      .trip-stop.left { justify-content: flex-start; }
-      .trip-stop.right { justify-content: flex-end; }
-      
-      .trip-stop.left .trip-card { margin-right: 52%; }
-      .trip-stop.right .trip-card { margin-left: 52%; }
-
-      /* حجم كارت أصغر وأنيق (Compact 3D Card) */
-      .trip-card { width: 46%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 14px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); transition: transform 0.3s ease, box-shadow 0.3s; cursor: pointer; position: relative; }
-      .trip-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 20px rgba(255,200,61,0.3); border-color: var(--yellow); }
-      
-      .trip-pin { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin-left: -17px; margin-top: -17px; border-radius: 50%; background: var(--yellow); border: 3px solid var(--navy); display: grid; place-items: center; font-size: 14px; box-shadow: 0 0 12px var(--yellow); z-index: 10; }
-
-      /* ظبط الموبايل عشان الخط يبجي ع الشمال والكروت تكون صغيرة ومرتبة زي الـ Wall of Fame */
-      @media(max-width: 768px) {
-        .route::before { left: 24px; }
-        .trip-stop.left, .trip-stop.right { justify-content: flex-end; }
-        .trip-stop.left .trip-card, .trip-stop.right .trip-card { margin-left: 50px; margin-right: 0; width: calc(100% - 50px); }
-        .trip-pin { left: 24px; margin-left: -17px; }
-      }
-    `);
-    document.head.append(style);
-  }
-
   trips.forEach((t, i) => {
     const base = t.folder ? 'trips/' + t.folder : null;
-    const isLeft = i % 2 === 0;
-    
-    (base ? probe(base, 12) : Promise.resolve([])).then(found => {
-      const coverImg = found.length > 0 ? found[0] : 'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=600&auto=format&fit=crop';
+    const explicit = (t.photos || []).map(f => path(f, base || 'trips'));
+
+    (base ? probe(base, 20) : Promise.resolve([])).then(found => {
+      const srcs = [...new Set([...explicit, ...found])];
       
-      // كارت بحجم صغير وأنيق بدون كلمة "صفحة اليوم" وخالي من الزحمة
-      const card = el('div', { class: 'trip-card' },
-        el('div', { style: 'margin-bottom: 8px;' },
-          el('span', { style: 'font-size: 0.7rem; color: var(--yellow); font-weight: 800; letter-spacing: 0.5px;', text: '📅 ' + (t.date || '') })
-        ),
-        el('div', { style: 'width: 100%; height: 130px; border-radius: 12px; overflow: hidden; background: #0A1F4A; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1);' },
-          el('img', { src: coverImg, style: 'width: 100%; height: 100%; object-fit: cover;' })
-        ),
-        el('h3', { style: 'font-family: var(--fh); font-weight: 900; font-size: 1.2rem; margin: 0; color: #fff;', text: t.name }),
-        t.note ? el('p', { style: 'font-family: var(--fc); font-size: 1rem; color: #94A3B8; margin: 4px 0 0 0; line-height: 1.2;', text: t.note }) : null
+      // الكارت الكلاسيكي لصفحة الرحلات الأساسية (زي ما هو بدون تغيير)
+      const ticket = el('div', { class: 'ticket tilt', style: 'cursor: pointer;' },
+        el('h3', { text: t.name }),
+        t.date ? el('span', { class: 'stamp', text: t.date }) : null,
+        t.note ? el('p', { text: t.note }) : null,
+        el('p', { class: 'hand', style: 'margin-top: 10px; color: #e0457b; font-size: 22px;', text: '✨ Tap to view Wall of Fame (' + srcs.length + ' photos)' })
       );
 
-      // لما تدوس على أي كارت، يفتح معرض الصور بالكامل (Wall of Fame style)
-      card.onclick = () => {
+      // عند الضغط على الكارت -> يفتح الـ Wall of Fame في الشاشة
+      ticket.onclick = () => {
         pop();
-        const galleryItems = (found.length > 0 ? found : [coverImg]).map(src => ({ src, cap: t.name + ' — ' + (t.date || '') }));
-        openLB(galleryItems, 0);
+        openWallOfFame(t.name, srcs);
       };
 
-      const stop = el('div', { class: `trip-stop ${isLeft ? 'left' : 'right'}` },
-        el('div', { class: 'trip-pin', text: isLeft ? '🐪' : '🔥' }),
-        card
+      const stop = el('div', { class: 'stop' },
+        el('span', { class: 'pinm', 'aria-hidden': 'true', text: i === 0 ? '✈️' : '📍' }),
+        ticket
       );
 
       box.append(stop);
     });
   });
 }
+
+/* ---------- WALL OF FAME MODAL LOGIC ---------- */
+function openWallOfFame(title, photos) {
+  let modal = $('#wall-modal');
+  if (!modal) {
+    modal = el('div', { id: 'wall-modal', class: 'wall-overlay' },
+      el('button', { class: 'wall-close', type: 'button', onclick: closeWallOfFame }, '✕'),
+      el('div', { class: 'wall-content' },
+        el('h2', { id: 'wall-title', class: 'wall-heading' }),
+        el('div', { id: 'wall-grid', class: 'wall-grid-container' })
+      )
+    );
+    document.body.append(modal);
+  }
+
+  $('#wall-title').textContent = title + ' 🏆 Wall of Fame';
+  const grid = $('#wall-grid');
+  grid.replaceChildren();
+
+  if (photos.length === 0) {
+    grid.append(el('p', { class: 'hand', style: 'color: #fff; font-size: 24px; grid-column: 1/-1;', text: '📷 No photos added yet!' }));
+  } else {
+    photos.forEach((src, idx) => {
+      const item = el('div', { class: 'wall-card tilt' },
+        el('img', { src: src, alt: title + ' ' + (idx + 1), loading: 'lazy' })
+      );
+      // ضغط الصورة جوه الـ Wall يفتح المكبر العادي
+      item.onclick = () => {
+        pop();
+        openLB(photos.map(s => ({ src: s, cap: title })), idx);
+      };
+      grid.append(item);
+    });
+  }
+
+  modal.classList.add('active');
+}
+
+function closeWallOfFame() {
+  const modal = $('#wall-modal');
+  if (modal) modal.classList.remove('active');
+}
+
 /* ============ SECRET MAIL ============ */
 const api = () => (S.mailApi || '').trim();
 let names = null;
