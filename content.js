@@ -78,5 +78,5 @@ window.SITE = {
   ],
   /* ---------- SECRET MAIL ----------
      Paste the long link you get from Google Apps Script here (README step 9). */
-  mailApi: "https://script.google.com/macros/s/AKfycbxmGtDqpL7kUXdYuvB3NC3N8Z4M6Bxl7gVOzFaUa7mdeXR8tQIVMcs3gbtedzC53VA_/exec"
+  mailApi: "https://script.google.com/macros/s/AKfycbxOLCa7wjYURtW-9iH2skoVqE69WbbDOX0Fxt8ByRwqITdG5PmwxYgTBpAqCgwo7-kC/exec"
 };
