@@ -204,11 +204,11 @@
       <form id="readform" autocomplete="off">
         <label class="field"><span>I am…</span>
           <select id="who" name="who" required><option value="">calling the post office…</option></select></label>
-        <label class="field"><span>My secret code (from WhatsApp)</span>
+        <label class="field"><span>Secret code </span>
           <input name="code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" required placeholder="• • • • •"></label>
         <button class="go" type="submit" id="readbtn">Open my mailbox 🔑</button>
         <p class="msg" id="readmsg" role="status"></p>
-        <button class="linkbtn" id="adminlink" type="button">I'm the manager 🛡️</button>
+            <button class="linkbtn" id="gotocodepage" type="button">Change my code 🔐</button>
       </form>
 
      <form id="adminform" hidden autocomplete="off">
@@ -218,7 +218,6 @@
      <button class="go" type="submit" id="adminbtn">Open manager view 🛡️</button>
      <p class="msg" id="adminmsg" role="status"></p>
      <button class="linkbtn" id="adminback" type="button">← back</button>
-     <button class="linkbtn" id="gotocodepage" type="button">Change my code 🔐</button>
    </form>
       <!-- وزود الفورم ده تحت الـ form القديم مباشرة -->
       <form id="changecodeform" hidden autocomplete="off">
