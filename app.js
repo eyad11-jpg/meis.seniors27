@@ -751,7 +751,27 @@ function initMail() {
     const af = $('#adminform'); if (af) af.hidden = true; 
     const rf = $('#readform'); if (rf) rf.hidden = false; 
   };
-
+  // الباب المخفي للمدير: اضغط على عنوان "Secret Mail" 5 مرات بسرعة
+  let dTaps = 0, dLast = 0;
+  const mailTitle = document.querySelector('#mail .title');
+  if (mailTitle) {
+    mailTitle.style.touchAction = 'manipulation';
+    mailTitle.style.userSelect = 'none';
+    mailTitle.addEventListener('click', () => {
+      const t = Date.now();
+      dTaps = (t - dLast > 1500) ? 1 : dTaps + 1; dLast = t;
+      if (dTaps < 5) return;
+      dTaps = 0;
+      const pw = $('#panelw'), pr = $('#panelr');
+      if (pw) pw.hidden = true;
+      if (pr) pr.hidden = false;
+      if (tabw) tabw.setAttribute('aria-pressed', 'false');
+      if (tabr) tabr.setAttribute('aria-pressed', 'true');
+      ['#readform', '#changecodeform', '#box'].forEach(s => { const n = $(s); if (n) n.hidden = true; });
+      const af = $('#adminform'); if (af) af.hidden = false;
+      pop();
+    });
+  }
   const showLetters = (list, admin) => {
     const rf = $('#readform'); if (rf) rf.hidden = true; 
     const af = $('#adminform'); if (af) af.hidden = true; 
