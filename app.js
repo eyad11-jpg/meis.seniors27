@@ -635,6 +635,8 @@ function initMail() {
     fillSelect($('#who'), l, 'pick your name…'); 
     const cc = $('#ccname'); 
     if (cc) fillSelect(cc, l, 'Select your name…'); 
+    const fr = $('#from'); 
+    if (fr) fillSelect(fr, l, 'a mystery person (anonymous)'); 
   });
 
   const tabw = $('#tabw'), tabr = $('#tabr');
